@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:fluro/fluro.dart';
 import 'routes/app_pages.dart';
+import 'localization_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,6 +27,10 @@ class MyApp extends StatelessWidget {
           title: 'Airdrop App',
           initialRoute: AppPages.initial,
           getPages: AppPages.routes,
+          locale: LocalizationService.locale ??
+              LocalizationService.fallbackLocale, // 使用设备语言
+          fallbackLocale: LocalizationService.fallbackLocale, // 设置回退语言
+          translations: LocalizationService(), // 设置语言翻译服务
           theme: ThemeData(
             scaffoldBackgroundColor: const Color(0xFF000000), // 全局背景颜色
             appBarTheme: const AppBarTheme(
