@@ -1,5 +1,10 @@
 class EnTranslations {
   static const Map<String, String> en = {
-    'hello': 'Hello',
+    'home': 'Home',
+    'earn': 'Earn',
+    'tasks': 'Tasks',
+    'friends': 'Friends',
+    'games': 'Games',
+    'login': 'Log in',
   };
 }

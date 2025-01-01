@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:fluro/fluro.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'routes/app_pages.dart';
 import 'localization_service.dart';
 
@@ -36,11 +37,11 @@ class MyApp extends StatelessWidget {
             appBarTheme: const AppBarTheme(
               color: Color(0xFF000000), // 设置 AppBar 背景颜色
             ),
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: Colors.black, // 底部导航栏背景色
-              selectedItemColor: Colors.white, // 选中项颜色
-              unselectedItemColor: Colors.grey, // 未选中项颜色
+            // 使用 GoogleFonts 设置全局字体
+            textTheme: GoogleFonts.figtreeTextTheme(
+              Theme.of(context).textTheme,
             ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(),
           ),
         );
       },
