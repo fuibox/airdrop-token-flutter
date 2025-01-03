@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 获取LoginController实例
     final LoginController loginController = Get.put(LoginController());
-
+    // 区号 国家icon 自定义下拉列表
+    // 登录短信验证逻辑联调
+    // 全局封装存储数据
+    // 获取用户信息api 存储全局数据
+    // 退出登录下拉
     return Scaffold(
       appBar: null,
       body: Stack(
         children: [
+          // 背景
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -85,18 +91,18 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  //logo
 
+                  //logo
                   Container(
-                    margin: EdgeInsets.only(top: 46.h, bottom: 12.h),
+                    margin: EdgeInsets.only(top: 46.w, bottom: 12.w),
                     child: Image.asset(
                       'assets/images/logo.png',
-                      height: 64.h,
+                      height: 64.w,
                       width: 64.w,
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(bottom: 95.h),
+                    margin: EdgeInsets.only(bottom: 95.w),
                     child: Text(
                       'AirDrop',
                       style: TextStyle(
@@ -109,7 +115,7 @@ class LoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        margin: EdgeInsets.only(bottom: 8.h),
+                        margin: EdgeInsets.only(bottom: 8.w),
                         child: Text(
                           'Phone Number',
                           style: TextStyle(
@@ -120,52 +126,140 @@ class LoginScreen extends StatelessWidget {
                       )
                     ],
                   ),
-
+                  // phone
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 0.h),
+                    padding: EdgeInsets.symmetric(vertical: 0.w),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
+                    height: 48.w,
                     child: Row(
                       children: [
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(horizontal: 0.w),
+                        //   child: DropdownButton<String>(
+                        //     value: "+1", // 默认国家区号
+                        //     items: <String>["+1", "+86", "+44", "+33"]
+                        //         .map((String value) {
+                        //       return DropdownMenuItem<String>(
+                        //         value: value,
+                        //         child: Row(
+                        //           children: [
+                        //             SizedBox(width: 8.w),
+                        //             Text(value),
+                        //           ],
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //     onChanged: (newValue) {},
+                        //     underline: SizedBox(),
+                        //   ),
+                        // ),
+                        // 自定义下拉组件
+                        // Container(
+                        //   child: Row(
+                        //     children: [
+                        //       // 国家区号和国旗
+                        //       CountryCodePicker(
+                        //         onChanged: (CountryCode country) {
+                        //           loginController.areaCode =
+                        //               country.toString() as RxString;
+                        //         },
+                        //         initialSelection: 'US', // 默认选项
+                        //         showCountryOnly: false, // 不仅显示国家名称
+                        //         showFlag: true, // 显示国旗
+                        //         showFlagDialog: true, // 显示国旗对话框
+                        //         flagDecoration: BoxDecoration(
+                        //           shape: BoxShape.circle, // 设置为圆形
+                        //           border: Border.all(
+                        //               color: Colors.transparent), // 可选的透明边框
+                        //         ),
+                        //         // favorite: ['US', 'IN'], // 可选的收藏国（可选）
+                        //       ),
+                        //       Image.asset(
+                        //         'assets/images/ic_arrow.png',
+                        //         height: 24.h,
+                        //         width: 24.w,
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 0.w),
-                          child: DropdownButton<String>(
-                            value: "+1", // 默认国家区号
-                            items: <String>["+1", "+86", "+44", "+33"]
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: 8.w),
-                                    Text(value),
-                                  ],
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start, // 左对齐
+                            crossAxisAlignment:
+                                CrossAxisAlignment.center, // 垂直居中
+                            children: [
+                              // 国家区号和国旗 // 这个插件有点重，有没有自由点的插件，我的需求只是简单的下拉框，显示国家国旗和区号，同时调整样式这些
+                              CountryCodePicker(
+                                onChanged: (CountryCode country) {
+                                  loginController.areaCode.value =
+                                      country.dialCode!; // 更新区号
+                                },
+                                padding: EdgeInsets.all(0),
+                                margin: EdgeInsets.all(0),
+                                initialSelection: 'US', // 默认选项
+                                showCountryOnly: false, // 显示区号和国旗
+                                showFlag: false, // 显示国旗
+                                showFlagDialog: true, // 显示国旗对话框
+                                flagDecoration: BoxDecoration(
+                                  shape: BoxShape.circle, // 设置为圆形
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (newValue) {},
-                            underline: SizedBox(),
+                                builder: (CountryCode? country) {
+                                  if (country == null)
+                                    return SizedBox(); // 如果没有选择任何国家，返回空的容器
+                                  return Row(
+                                    children: [
+                                      // 显示国旗
+                                      CountryCodePicker(
+                                        margin: EdgeInsets.all(0),
+                                        padding: EdgeInsets.all(0),
+                                        showFlag: true, // 显示国旗
+                                        showCountryOnly: false, // 显示区号和国旗
+                                        initialSelection: 'US', // 默认国家
+                                        flagDecoration: BoxDecoration(
+                                          shape: BoxShape.circle, // 设置为圆形
+                                        ),
+                                        onChanged: (country) {
+                                          loginController.areaCode.value =
+                                              country.dialCode!;
+                                        },
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 2.w),
+                                        child: Image.asset(
+                                          'assets/images/ic_arrow.png', // 你的箭头图标路径
+                                          height: 24.0, // 图标高度
+                                          width: 24.0, // 图标宽度
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        // 手机号
+
+                        // phone
                         Expanded(
                           child: TextField(
                             onChanged: (value) {
-                              // 更新手机号
+                              // update phone
                               loginController.setPhoneNumber(value);
                             },
                             controller: TextEditingController(
                                 text: loginController.phoneNumber.value),
                             keyboardType: TextInputType.phone,
+                            cursorColor: const Color(0xFFCC9533),
                             decoration: InputDecoration(
                               hintText: "Please enter phone number",
                               hintStyle: TextStyle(
-                                  color: Color(0xFFBFBFBF), fontSize: 16.sp),
+                                  color: const Color(0xFFBFBFBF),
+                                  fontSize: 16.sp),
                               border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 14.h),
+                              contentPadding: EdgeInsets.only(left: 0.w),
                             ),
                           ),
                         ),
@@ -173,7 +267,11 @@ class LoginScreen extends StatelessWidget {
                         Obx(() {
                           return loginController.phoneNumber.value.isNotEmpty
                               ? IconButton(
-                                  icon: Icon(Icons.clear, color: Colors.grey),
+                                  icon: Image.asset(
+                                    'assets/images/ic_clean.png',
+                                    height: 20.w,
+                                    width: 20.w,
+                                  ),
                                   onPressed: () {
                                     // loginController.setPhoneNumber('');
                                   },
@@ -188,7 +286,7 @@ class LoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        margin: EdgeInsets.only(bottom: 8.h, top: 16.h),
+                        margin: EdgeInsets.only(bottom: 8.w, top: 16.w),
                         child: Text(
                           'Verification Code',
                           style: TextStyle(
@@ -206,9 +304,9 @@ class LoginScreen extends StatelessWidget {
                         Expanded(
                           child: Container(
                             width: 343.w,
-                            height: 48.h,
+                            height: 48.w,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Color(0XFFFFFFFF),
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Row(
@@ -218,13 +316,14 @@ class LoginScreen extends StatelessWidget {
                                     onChanged: (value) {
                                       // loginController.setOtp(value);
                                     },
+                                    cursorColor: Color(0xFFCC9533),
                                     controller: TextEditingController(
                                         text: loginController.otp.value),
                                     decoration: InputDecoration(
                                       hintText: "",
                                       border: InputBorder.none,
                                       contentPadding:
-                                          EdgeInsets.symmetric(vertical: 14.h),
+                                          EdgeInsets.only(left: 16.w),
                                     ),
                                   ),
                                 ),
@@ -259,20 +358,27 @@ class LoginScreen extends StatelessWidget {
 
                   // 登录
                   Container(
-                    margin: EdgeInsets.only(top: 40.h, bottom: 88.h),
+                    margin: EdgeInsets.only(top: 40.w, bottom: 88.w),
                     width: double.infinity,
-                    height: 48.h,
+                    height: 48.w,
                     decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(10.r),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0xFFFEFFD1),
+                          offset: Offset(0, -3),
+                          blurRadius: 2,
+                        ),
+                      ],
                     ),
                     child: ElevatedButton(
                       onPressed: () {
                         loginController.submitLogin();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFD99621),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        backgroundColor: const Color(0xFFD99621),
+                        padding: EdgeInsets.symmetric(vertical: 14.w),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
@@ -280,7 +386,7 @@ class LoginScreen extends StatelessWidget {
                       child: Text(
                         'Register/Login',
                         style: TextStyle(
-                          color: Color(0xFF000000),
+                          color: const Color(0xFF000000),
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w900,
                         ),
@@ -295,14 +401,14 @@ class LoginScreen extends StatelessWidget {
                         margin: EdgeInsets.only(right: 24.w),
                         child: Image.asset(
                           'assets/images/ic_google.png',
-                          height: 44.h,
+                          height: 44.w,
                           width: 44.w,
                         ),
                       ),
                       Container(
                         child: Image.asset(
                           'assets/images/ic_x.png',
-                          height: 44.h,
+                          height: 44.w,
                           width: 44.w,
                         ),
                       )

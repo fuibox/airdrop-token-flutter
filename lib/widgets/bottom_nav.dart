@@ -11,7 +11,7 @@ class BottomNav extends StatelessWidget {
     return Obx(() {
       // Obx 监听
       return Container(
-        padding: EdgeInsets.only(top: 2.h),
+        padding: EdgeInsets.only(top: 2.w),
         decoration: const BoxDecoration(
           border: Border(
             top: BorderSide(
@@ -39,7 +39,7 @@ class BottomNav extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Container(
                 width: 60.w,
-                height: 49.h,
+                height: 49.w,
                 decoration: BoxDecoration(
                   image: homeController.selectedIndex.value == 0
                       ? const DecorationImage(
@@ -57,7 +57,7 @@ class BottomNav extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: 30.w,
-                      height: 30.h,
+                      height: 30.w,
                       child: Image.asset(
                         'assets/images/tb_home.png',
                       ),
@@ -80,7 +80,7 @@ class BottomNav extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Container(
                   width: 60.w,
-                  height: 49.h,
+                  height: 49.w,
                   decoration: BoxDecoration(
                     image: homeController.selectedIndex.value == 1
                         ? const DecorationImage(
@@ -96,7 +96,7 @@ class BottomNav extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 30.w,
-                        height: 30.h,
+                        height: 30.w,
                         child: Image.asset(
                           'assets/images/tb_earn.png',
                         ),
@@ -118,7 +118,7 @@ class BottomNav extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Container(
                   width: 60.w,
-                  height: 49.h,
+                  height: 49.w,
                   decoration: BoxDecoration(
                     image: homeController.selectedIndex.value == 2
                         ? const DecorationImage(
@@ -134,7 +134,7 @@ class BottomNav extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 30.w,
-                        height: 30.h,
+                        height: 30.w,
                         child: Image.asset(
                           'assets/images/tb_task.png',
                         ),
@@ -156,7 +156,7 @@ class BottomNav extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Container(
                   width: 60.w,
-                  height: 49.h,
+                  height: 49.w,
                   decoration: BoxDecoration(
                     image: homeController.selectedIndex.value == 3
                         ? const DecorationImage(
@@ -172,7 +172,7 @@ class BottomNav extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 30.w,
-                        height: 30.h,
+                        height: 30.w,
                         child: Image.asset(
                           'assets/images/tb_friend.png',
                         ),
@@ -194,7 +194,7 @@ class BottomNav extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Container(
                   width: 60.w,
-                  height: 49.h,
+                  height: 49.w,
                   decoration: BoxDecoration(
                     image: homeController.selectedIndex.value == 4
                         ? const DecorationImage(
@@ -210,7 +210,7 @@ class BottomNav extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 30.w,
-                        height: 30.h,
+                        height: 30.w,
                         child: Image.asset(
                           'assets/images/tb_games.png',
                         ),

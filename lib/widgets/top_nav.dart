@@ -9,7 +9,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   TopNav({Key? key})
-      : preferredSize = Size.fromHeight(44.h),
+      : preferredSize = Size.fromHeight(44.w),
         super(key: key);
 
   @override
@@ -20,7 +20,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Image.asset(
             'assets/images/logo.png',
-            height: 32.h,
+            height: 32.w,
             width: 32.w,
           ),
           Row(
@@ -30,7 +30,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                 child: Container(
                   margin: EdgeInsets.only(left: 0.w, right: 0.w),
                   width: 110.w,
-                  height: 28.h,
+                  height: 28.w,
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(30.r),
@@ -48,7 +48,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                         child: Image.asset(
                           'assets/images/ic_lang.png',
                           width: 18.w,
-                          height: 18.h,
+                          height: 18.w,
                         ),
                       ),
                       Padding(
@@ -67,7 +67,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                         child: Image.asset(
                           'assets/images/ic_arrow.png',
                           width: 14.w,
-                          height: 14.h,
+                          height: 14.w,
                         ),
                       ),
                     ],
@@ -79,7 +79,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                 child: Container(
                   margin: EdgeInsets.only(left: 8.w, right: 8.w),
                   width: 60.w,
-                  height: 28.h,
+                  height: 28.w,
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(30.r),
@@ -97,7 +97,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                         child: Image.asset(
                           'assets/images/nav_chest.png',
                           width: 22.w,
-                          height: 22.h,
+                          height: 22.w,
                         ),
                       ),
                       Padding(
@@ -122,7 +122,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                 },
                 child: Container(
                   width: 72.w,
-                  height: 28.h,
+                  height: 28.w,
                   decoration: BoxDecoration(
                     color: Color(0xFFCC9533),
                     borderRadius: BorderRadius.circular(30.r),

@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/pages/home/home_assets_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
@@ -18,11 +19,7 @@ class HomeScreen extends StatelessWidget {
       body: Obx(() {
         switch (controller.selectedIndex.value) {
           case 0:
-            return Center(
-                child: Text(
-              'Home Page',
-              style: TextStyle(color: Colors.white),
-            ));
+            return HomeAssetsCardScreen();
           case 1:
             return EarnScreen();
           case 2:
@@ -33,7 +30,7 @@ class HomeScreen extends StatelessWidget {
             return GamesScreen();
 
           default:
-            return Center(child: Text('Home Page'));
+            return HomeAssetsCardScreen();
         }
       }),
       bottomNavigationBar: BottomNav(), // 底部导航栏

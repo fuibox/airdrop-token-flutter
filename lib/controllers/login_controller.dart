@@ -6,6 +6,9 @@ class LoginController extends GetxController {
   var phoneNumber = ''.obs;
   var otp = ''.obs;
 
+  //默认区号
+  var areaCode = '+1'.obs;
+
   // 获取验证码倒计时状态
   var _countdown = 60.obs;
   var _isButtonEnabled = true.obs;
