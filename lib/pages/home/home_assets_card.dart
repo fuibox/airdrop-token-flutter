@@ -1,7 +1,7 @@
-import 'package:airdrop_flutter/main.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
 import 'package:marquee/marquee.dart';
@@ -17,7 +17,6 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   @override
   Widget build(BuildContext context) {
     final HomeController homeController = Get.put(HomeController());
-
     return SingleChildScrollView(
       child: Center(
         child: Stack(
@@ -28,20 +27,39 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    alignment: Alignment.center,
-                    width: 217.w,
-                    height: 22.w,
-                    margin: EdgeInsets.only(bottom: 24.w, top: 12.w),
-                    decoration: BoxDecoration(
-                      color: Color(0X33FFFFFF),
-                      borderRadius: BorderRadius.circular(66.r),
-                    ),
-                    child: Text(
-                      '0xfd283… minted AirDrop Coins NFT',
-                      style:
-                          TextStyle(color: Color(0X55FFFFFF), fontSize: 12.sp),
-                    ),
+                  Obx(
+                    () {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal, // 横向滚动
+                        child: Row(
+                          children: [
+                            for (int i = 0;
+                                i < homeController.items.length;
+                                i++)
+                              Transform.translate(
+                                offset: Offset(homeController.offsetX.value, 0),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  width: 217.w,
+                                  height: 22.w,
+                                  margin: EdgeInsets.only(
+                                      bottom: 24.w, top: 12.w, right: 8.w),
+                                  decoration: BoxDecoration(
+                                    color: Color(0X33FFFFFF),
+                                    borderRadius: BorderRadius.circular(66.r),
+                                  ),
+                                  child: Text(
+                                    homeController.items[i],
+                                    style: TextStyle(
+                                        color: Color(0X55FFFFFF),
+                                        fontSize: 12.sp),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
 
                   Container(
