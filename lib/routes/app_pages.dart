@@ -1,26 +1,28 @@
-import 'package:airdrop_flutter/pages/loading/loading.dart';
+import 'package:airdrop_flutter/pages/home/home_assets_details.dart';
 import 'package:fluro/fluro.dart';
 import 'package:get/get.dart';
-import '../pages/card/card.dart';
-import '../pages/games/games.dart';
-import '../pages/home/home.dart';
-import '../pages/friends/friends.dart';
-import '../pages/login/login.dart';
-import '../pages/pay/pay.dart';
-import '../pages/earn/earn.dart';
-import '../pages/tasks/tasks.dart';
+import 'package:airdrop_flutter/pages/loading/loading.dart';
+import 'package:airdrop_flutter/pages/card/card.dart';
+import 'package:airdrop_flutter/pages/games/games.dart';
+import 'package:airdrop_flutter/pages/home/home.dart';
+import 'package:airdrop_flutter/pages/friends/friends.dart';
+import 'package:airdrop_flutter/pages/login/login.dart';
+import 'package:airdrop_flutter/pages/pay/pay.dart';
+import 'package:airdrop_flutter/pages/earn/earn.dart';
+import 'package:airdrop_flutter/pages/tasks/tasks.dart';
 
 class AppPages {
-  static String initial = '/home';
-  static String card = '/card';
-  static String games = '/games';
-  static String home = '/home';
-  static String friends = '/friends';
-  static String loading = '/loading';
-  static String login = '/login';
-  static String pay = '/pay';
-  static String earn = '/earn';
-  static String tasks = '/tasks';
+  static const String initial = '/home';
+  static const String card = '/card';
+  static const String games = '/games';
+  static const String home = '/home';
+  static const String friends = '/friends';
+  static const String loading = '/loading';
+  static const String login = '/login';
+  static const String pay = '/pay';
+  static const String earn = '/earn';
+  static const String tasks = '/tasks';
+  static const String assets = '/assets';
 
   static final routes = [
     GetPage(name: home, page: () => HomeScreen()),
@@ -32,6 +34,7 @@ class AppPages {
     GetPage(name: pay, page: () => PayScreen()),
     GetPage(name: earn, page: () => EarnScreen()),
     GetPage(name: tasks, page: () => TasksScreen()),
+    GetPage(name: assets, page: () => HomeAssetsDetailsScreen()),
   ];
 
   static void configureRoutes(FluroRouter router) {
@@ -53,5 +56,8 @@ class AppPages {
         handler: Handler(handlerFunc: (context, params) => EarnScreen()));
     router.define(tasks,
         handler: Handler(handlerFunc: (context, params) => TasksScreen()));
+    router.define(assets,
+        handler: Handler(
+            handlerFunc: (context, params) => HomeAssetsDetailsScreen()));
   }
 }

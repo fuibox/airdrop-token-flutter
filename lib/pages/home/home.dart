@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TopNav(), // 顶部导航栏
+      appBar: TopNav(),
       body: Obx(() {
         switch (controller.selectedIndex.value) {
           case 0:
@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
             return HomeAssetsCardScreen();
         }
       }),
-      bottomNavigationBar: BottomNav(), // 底部导航栏
+      bottomNavigationBar: BottomNav(),
     );
   }
 }

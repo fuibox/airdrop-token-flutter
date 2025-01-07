@@ -7,18 +7,12 @@ import 'package:country_code_picker/country_code_picker.dart';
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // 获取LoginController实例
     final LoginController loginController = Get.put(LoginController());
-    // 区号 国家icon 自定义下拉列表
-    // 登录短信验证逻辑联调
-    // 全局封装存储数据
-    // 获取用户信息api 存储全局数据
-    // 退出登录下拉
+
     return Scaffold(
       appBar: null,
       body: Stack(
         children: [
-          // 背景
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -136,62 +130,11 @@ class LoginScreen extends StatelessWidget {
                     height: 48.w,
                     child: Row(
                       children: [
-                        // Container(
-                        //   padding: EdgeInsets.symmetric(horizontal: 0.w),
-                        //   child: DropdownButton<String>(
-                        //     value: "+1", // 默认国家区号
-                        //     items: <String>["+1", "+86", "+44", "+33"]
-                        //         .map((String value) {
-                        //       return DropdownMenuItem<String>(
-                        //         value: value,
-                        //         child: Row(
-                        //           children: [
-                        //             SizedBox(width: 8.w),
-                        //             Text(value),
-                        //           ],
-                        //         ),
-                        //       );
-                        //     }).toList(),
-                        //     onChanged: (newValue) {},
-                        //     underline: SizedBox(),
-                        //   ),
-                        // ),
-                        // 自定义下拉组件
-                        // Container(
-                        //   child: Row(
-                        //     children: [
-                        //       // 国家区号和国旗
-                        //       CountryCodePicker(
-                        //         onChanged: (CountryCode country) {
-                        //           loginController.areaCode =
-                        //               country.toString() as RxString;
-                        //         },
-                        //         initialSelection: 'US', // 默认选项
-                        //         showCountryOnly: false, // 不仅显示国家名称
-                        //         showFlag: true, // 显示国旗
-                        //         showFlagDialog: true, // 显示国旗对话框
-                        //         flagDecoration: BoxDecoration(
-                        //           shape: BoxShape.circle, // 设置为圆形
-                        //           border: Border.all(
-                        //               color: Colors.transparent), // 可选的透明边框
-                        //         ),
-                        //         // favorite: ['US', 'IN'], // 可选的收藏国（可选）
-                        //       ),
-                        //       Image.asset(
-                        //         'assets/images/ic_arrow.png',
-                        //         height: 24.h,
-                        //         width: 24.w,
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
                         Container(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start, // 左对齐
-                            crossAxisAlignment:
-                                CrossAxisAlignment.center, // 垂直居中
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // 国家区号和国旗 // 这个插件有点重，有没有自由点的插件，我的需求只是简单的下拉框，显示国家国旗和区号，同时调整样式这些
                               CountryCodePicker(
                                 onChanged: (CountryCode country) {
                                   loginController.areaCode.value =

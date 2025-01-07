@@ -14,9 +14,19 @@ class HomeAssetsCardScreen extends StatefulWidget {
 }
 
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
+  HomeController homeController = Get.put(HomeController());
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化 HomeController
+    homeController = Get.put(HomeController());
+    // 开始滚动
+    // homeController.startScrolling();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final HomeController homeController = Get.put(HomeController());
     return SingleChildScrollView(
       child: Center(
         child: Stack(

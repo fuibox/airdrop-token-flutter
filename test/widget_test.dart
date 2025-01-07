@@ -9,11 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:airdrop_flutter/main.dart';
+import 'package:fluro/fluro.dart';
+import 'package:airdrop_flutter/routes/app_pages.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    final FluroRouter router = FluroRouter();
+
+    AppPages.configureRoutes(router);
+
+    await tester.pumpWidget(MyApp(router));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

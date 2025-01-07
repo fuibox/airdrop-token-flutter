@@ -24,4 +24,4 @@ class ApiController extends GetxController {
   }
 }
 
-final apiController = Get.put(ApiController());  // 将 controller 注入 GetX 管理中
+final apiController = Get.put(ApiController());
