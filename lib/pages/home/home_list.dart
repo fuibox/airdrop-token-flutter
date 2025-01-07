@@ -28,13 +28,8 @@ class _HomeListScreenState extends State<HomeListScreen> {
               decoration: BoxDecoration(
                 color: Color(0XFF1F0B0E),
                 borderRadius: BorderRadius.circular(10.r),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x33FFFFFF),
-                    offset: Offset(0, -3),
-                    blurRadius: 2,
-                  ),
-                ],
+                border: Border(
+                    top: BorderSide(width: 2.w, color: Color(0x33FFFFFF))),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,13 +81,8 @@ class _HomeListScreenState extends State<HomeListScreen> {
             decoration: BoxDecoration(
               color: Color(0XFF1F0B0E),
               borderRadius: BorderRadius.circular(10.r),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33FFFFFF),
-                  offset: Offset(0, -3),
-                  blurRadius: 2,
-                ),
-              ],
+              border:
+                  Border(top: BorderSide(width: 2.w, color: Color(0x33FFFFFF))),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

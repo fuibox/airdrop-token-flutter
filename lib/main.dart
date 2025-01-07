@@ -40,6 +40,8 @@ class MyApp extends StatelessWidget {
           fallbackLocale: LocalizationService.fallbackLocale, // 设置回退语言
           translations: LocalizationService(), // 语言翻译服务
           theme: ThemeData(
+            highlightColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
             scaffoldBackgroundColor: const Color(0xFF000000), // 设置全局背景色为黑色
             appBarTheme: const AppBarTheme(
               color: Color(0xFF000000), //  AppBar 背景颜色

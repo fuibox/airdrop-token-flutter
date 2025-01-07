@@ -65,7 +65,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                       Padding(
                         padding: EdgeInsets.only(left: 0.w, right: 0.w),
                         child: Image.asset(
-                          'assets/images/ic_arrow.png',
+                          'assets/images/ld_sele.png',
                           width: 14.w,
                           height: 14.w,
                         ),

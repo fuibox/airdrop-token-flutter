@@ -21,6 +21,7 @@ class BottomNav extends StatelessWidget {
           ),
         ),
         child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           backgroundColor: const Color(0xFF000000),
           currentIndex: homeController.selectedIndex.value,
           onTap: (index) {
@@ -34,7 +35,6 @@ class BottomNav extends StatelessWidget {
           //     fontWeight: FontWeight.normal, color: Colors.grey),
           selectedFontSize: 0.sp,
           unselectedFontSize: 0.sp,
-          type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
               icon: Container(

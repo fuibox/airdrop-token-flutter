@@ -10,8 +10,20 @@ class EarnScreen extends StatefulWidget {
 class _EarnScreenState extends State<EarnScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Text('rewards'),
+    return SingleChildScrollView(
+      child: Container(
+        child: Column(
+          children: [
+            // Prize draw
+
+            // Application
+
+            // ADT application Zone
+
+            // Ecosystem
+          ],
+        ),
+      ),
     );
   }
 }
