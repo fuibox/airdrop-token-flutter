@@ -10,6 +10,7 @@ import 'package:airdrop_flutter/pages/login/login.dart';
 import 'package:airdrop_flutter/pages/pay/pay.dart';
 import 'package:airdrop_flutter/pages/earn/earn.dart';
 import 'package:airdrop_flutter/pages/tasks/tasks.dart';
+import 'package:airdrop_flutter/pages/home/home_leaderboard.dart';
 
 class AppPages {
   static const String initial = '/home';
@@ -23,6 +24,7 @@ class AppPages {
   static const String earn = '/earn';
   static const String tasks = '/tasks';
   static const String assets = '/assets';
+  static const String ranking = '/ranking';
 
   static final routes = [
     GetPage(name: home, page: () => HomeScreen()),
@@ -35,6 +37,7 @@ class AppPages {
     GetPage(name: earn, page: () => EarnScreen()),
     GetPage(name: tasks, page: () => TasksScreen()),
     GetPage(name: assets, page: () => HomeAssetsDetailsScreen()),
+    GetPage(name: ranking, page: () => HomeLeaderboardScreen()),
   ];
 
   static void configureRoutes(FluroRouter router) {
@@ -59,5 +62,8 @@ class AppPages {
     router.define(assets,
         handler: Handler(
             handlerFunc: (context, params) => HomeAssetsDetailsScreen()));
+    router.define(ranking,
+        handler:
+            Handler(handlerFunc: (context, params) => HomeLeaderboardScreen()));
   }
 }

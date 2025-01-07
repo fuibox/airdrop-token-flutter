@@ -1,10 +1,8 @@
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
-import 'package:marquee/marquee.dart';
 
 class HomeAssetsCardScreen extends StatefulWidget {
   HomeAssetsCardScreen({Key? key}) : super(key: key);
@@ -270,29 +268,34 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                         )
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(right: 2.w),
-                                          child: Image.asset(
-                                            'assets/images/adt_icon.png',
-                                            width: 20.w,
-                                            height: 20.w,
+                                    InkWell(
+                                      onTap: () {
+                                        Get.toNamed('/ranking');
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(right: 2.w),
+                                            child: Image.asset(
+                                              'assets/images/adt_icon.png',
+                                              width: 20.w,
+                                              height: 20.w,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          'Ranking list',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w900),
-                                        ),
-                                        Image.asset(
-                                          'assets/images/home_btn_right.png',
-                                          width: 12.w,
-                                          height: 12.w,
-                                        )
-                                      ],
+                                          Text(
+                                            'Ranking list',
+                                            style: TextStyle(
+                                                color: Color(0XFF000000),
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                          Image.asset(
+                                            'assets/images/home_btn_right.png',
+                                            width: 12.w,
+                                            height: 12.w,
+                                          )
+                                        ],
+                                      ),
                                     )
                                   ],
                                 ),
