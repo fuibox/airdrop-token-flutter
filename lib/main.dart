@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -14,6 +15,8 @@ void main() {
   AppPages.configureRoutes(router);
 
   RouteInterceptor.configureInterceptor(router);
+
+  Get.put(NotificationController());
 
   runApp(MyApp(router));
 }

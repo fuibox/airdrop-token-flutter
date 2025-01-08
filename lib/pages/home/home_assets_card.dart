@@ -1,4 +1,6 @@
+import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
+import 'package:airdrop_flutter/ui/global_notifiication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,14 +15,11 @@ class HomeAssetsCardScreen extends StatefulWidget {
 
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   HomeController homeController = Get.put(HomeController());
+  final NotificationController notificationController = Get.find(); // 获取全局控制器
 
   @override
   void initState() {
     super.initState();
-    // 初始化 HomeController
-    homeController = Get.put(HomeController());
-    // 开始滚动
-    // homeController.startScrolling();
   }
 
   @override
@@ -35,41 +34,6 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Obx(
-                    () {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // 横向滚动
-                        child: Row(
-                          children: [
-                            for (int i = 0;
-                                i < homeController.items.length;
-                                i++)
-                              Transform.translate(
-                                offset: Offset(homeController.offsetX.value, 0),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 217.w,
-                                  height: 22.w,
-                                  margin: EdgeInsets.only(
-                                      bottom: 24.w, top: 12.w, right: 8.w),
-                                  decoration: BoxDecoration(
-                                    color: Color(0X33FFFFFF),
-                                    borderRadius: BorderRadius.circular(66.r),
-                                  ),
-                                  child: Text(
-                                    homeController.items[i],
-                                    style: TextStyle(
-                                        color: Color(0X55FFFFFF),
-                                        fontSize: 12.sp),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-
                   Container(
                     width: 343.w,
                     height: 379.w,
