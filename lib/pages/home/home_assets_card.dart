@@ -1,10 +1,8 @@
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
-import 'package:marquee/marquee.dart';
 
 class HomeAssetsCardScreen extends StatefulWidget {
   HomeAssetsCardScreen({Key? key}) : super(key: key);
@@ -14,9 +12,15 @@ class HomeAssetsCardScreen extends StatefulWidget {
 }
 
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
+  HomeController homeController = Get.put(HomeController());
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final HomeController homeController = Get.put(HomeController());
     return SingleChildScrollView(
       child: Center(
         child: Stack(
@@ -27,41 +31,6 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Obx(
-                    () {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // 横向滚动
-                        child: Row(
-                          children: [
-                            for (int i = 0;
-                                i < homeController.items.length;
-                                i++)
-                              Transform.translate(
-                                offset: Offset(homeController.offsetX.value, 0),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 217.w,
-                                  height: 22.w,
-                                  margin: EdgeInsets.only(
-                                      bottom: 24.w, top: 12.w, right: 8.w),
-                                  decoration: BoxDecoration(
-                                    color: Color(0X33FFFFFF),
-                                    borderRadius: BorderRadius.circular(66.r),
-                                  ),
-                                  child: Text(
-                                    homeController.items[i],
-                                    style: TextStyle(
-                                        color: Color(0X55FFFFFF),
-                                        fontSize: 12.sp),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-
                   Container(
                     width: 343.w,
                     height: 379.w,
@@ -260,29 +229,34 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                         )
                                       ],
                                     ),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.only(right: 2.w),
-                                          child: Image.asset(
-                                            'assets/images/adt_icon.png',
-                                            width: 20.w,
-                                            height: 20.w,
+                                    InkWell(
+                                      onTap: () {
+                                        Get.toNamed('/ranking');
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(right: 2.w),
+                                            child: Image.asset(
+                                              'assets/images/adt_icon.png',
+                                              width: 20.w,
+                                              height: 20.w,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          'Ranking list',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w900),
-                                        ),
-                                        Image.asset(
-                                          'assets/images/home_btn_right.png',
-                                          width: 12.w,
-                                          height: 12.w,
-                                        )
-                                      ],
+                                          Text(
+                                            'Ranking list',
+                                            style: TextStyle(
+                                                color: Color(0XFF000000),
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.w900),
+                                          ),
+                                          Image.asset(
+                                            'assets/images/home_btn_right.png',
+                                            width: 12.w,
+                                            height: 12.w,
+                                          )
+                                        ],
+                                      ),
                                     )
                                   ],
                                 ),
@@ -294,13 +268,17 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                 decoration: BoxDecoration(
                                   color: Color(0XFFD99B21),
                                   borderRadius: BorderRadius.circular(10.r),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0xFFFEFFD1),
-                                      offset: Offset(0, -3),
-                                      blurRadius: 2,
-                                    ),
-                                  ],
+                                  border: Border(
+                                      top: BorderSide(
+                                          width: 2.w,
+                                          color: Color(0xFFFEFFD1))),
+                                  // boxShadow: const [
+                                  //   BoxShadow(
+                                  //     color: Color(0xFFFEFFD1),
+                                  //     offset: Offset(0, -3),
+                                  //     blurRadius: 2,
+                                  //   ),
+                                  // ],
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -348,13 +326,9 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                     decoration: BoxDecoration(
                       color: Color(0XFF1F0B0E),
                       borderRadius: BorderRadius.circular(10.r),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x33FFFFFF),
-                          offset: Offset(0, -3),
-                          blurRadius: 2,
-                        ),
-                      ],
+                      border: Border(
+                          top:
+                              BorderSide(width: 2.w, color: Color(0x33FFFFFF))),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -369,40 +343,50 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                               // 头像
                               Container(
                                 width: 56.w,
-                                height: 56.w,
-                                child: Image.asset(
-                                  'assets/images/user_avatar.png',
+                                height: 65.w,
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                      alignment: Alignment.topCenter,
+                                      image: AssetImage(
+                                        'assets/images/user_avatar.png',
+                                      ),
+                                      fit: BoxFit.contain),
                                 ),
-                              ),
-
-                              Container(
-                                alignment: Alignment.center,
-                                width: 40.w,
-                                height: 16.w,
-                                decoration: BoxDecoration(
-                                  color: Color(0XFFE5B450),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x33E5B450),
-                                      offset: Offset(0, -3),
-                                      blurRadius: 2,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.center,
+                                      width: 40.w,
+                                      height: 16.w,
+                                      decoration: BoxDecoration(
+                                        color: Color(0XFFE5B450),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0x33E5B450),
+                                            offset: Offset(0, -3),
+                                            blurRadius: 2,
+                                          ),
+                                        ],
+                                        borderRadius:
+                                            BorderRadius.circular(30.r),
+                                        border: Border.all(
+                                          color: Color(0XFFFFDF80),
+                                          width: 2.w,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'LV.6',
+                                        style: TextStyle(
+                                          color: Color(0XFF733A11),
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
                                     ),
                                   ],
-                                  borderRadius: BorderRadius.circular(30.r),
-                                  border: Border.all(
-                                    color: Color(0XFFFFDF80),
-                                    width: 2.w,
-                                  ),
                                 ),
-                                child: Text(
-                                  'LV.6',
-                                  style: TextStyle(
-                                    color: Color(0XFF733A11),
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ),
+                              )
                             ],
                           ),
                         ),

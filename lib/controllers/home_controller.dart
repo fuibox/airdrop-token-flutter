@@ -13,16 +13,16 @@ class HomeController extends GetxController {
     '0xfd283… minted AirDrop Coins NFT',
     '0xfd283… minted AirDrop Coins NFT',
     '0xfd283… minted AirDrop Coins NFT',
-  ].obs; // 示例的静态内容列表
+  ].obs;
 
   RxDouble offsetX = 0.0.obs; // 控制滚动的X偏移量
-  RxDouble speed = 10000.0.obs; // 滚动的速度
+  RxDouble speed = 1000.0.obs; // 滚动的速度
   late Timer _timer; // 定时器
 
-  // 开始滚动的逻辑
+  // 开始滚动的逻辑r
   void startScrolling() {
-    _timer = Timer.periodic(Duration(milliseconds: 5000), (timer) {
-      if (offsetX.value > 300) {
+    _timer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
+      if (offsetX.value > 1000) {
         offsetX.value = -100.0; // 循环效果
       } else {
         offsetX.value += speed.value; // 按照设定的速度
