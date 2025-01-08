@@ -1,6 +1,4 @@
-import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
-import 'package:airdrop_flutter/ui/global_notifiication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -15,7 +13,6 @@ class HomeAssetsCardScreen extends StatefulWidget {
 
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   HomeController homeController = Get.put(HomeController());
-  final NotificationController notificationController = Get.find(); // 获取全局控制器
 
   @override
   void initState() {

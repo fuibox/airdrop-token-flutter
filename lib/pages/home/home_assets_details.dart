@@ -59,23 +59,28 @@ class _HomeAssetsDetailsScreenState extends State<HomeAssetsDetailsScreen> {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/assets_record.png',
-                        width: 16.w,
-                        height: 16.w,
-                      ),
-                      Text(
-                        'Records',
-                        style: TextStyle(
-                            color: Color(0XFF333333),
-                            fontSize: 16.sp,
-                            decoration: TextDecoration.none,
-                            fontWeight: FontWeight.w400),
-                      )
-                    ],
-                  ),
+                  InkWell(
+                    onTap: () {
+                      Get.toNamed('/record');
+                    },
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/assets_record.png',
+                          width: 16.w,
+                          height: 16.w,
+                        ),
+                        Text(
+                          'Records',
+                          style: TextStyle(
+                              color: Color(0XFF333333),
+                              fontSize: 16.sp,
+                              decoration: TextDecoration.none,
+                              fontWeight: FontWeight.w400),
+                        )
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
