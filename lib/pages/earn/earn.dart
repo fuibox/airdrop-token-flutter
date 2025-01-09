@@ -1,6 +1,6 @@
-import 'package:airdrop_flutter/main.dart';
 import 'package:airdrop_flutter/pages/earn/adt_application_zone.dart';
 import 'package:airdrop_flutter/pages/earn/ecosystem.dart';
+import 'package:airdrop_flutter/ui/earn_airdropbox.dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -131,18 +131,23 @@ class _EarnScreenState extends State<EarnScreen> {
                               width: 160.w,
                               height: 160.w,
                             )),
-                        Container(
-                          height: 145.w,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Image.asset(
-                                'assets/images/earn_newbox.png',
-                                width: 44.w,
-                                height: 62.w,
-                              )
-                            ],
+                        InkWell(
+                          onTap: () {
+                            showEarnAirdropBox();
+                          },
+                          child: Container(
+                            height: 145.w,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Image.asset(
+                                  'assets/images/earn_newbox.png',
+                                  width: 44.w,
+                                  height: 62.w,
+                                )
+                              ],
+                            ),
                           ),
                         )
                       ],

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-class EcosystemController extends GetxController {
-  var ecosystemList = <String>[
+class UserCardListController extends GetxController {
+  var userCardList = <String>[
     'Item 1',
     'Item 2',
     'Item 3',
@@ -12,7 +12,7 @@ class EcosystemController extends GetxController {
     'Item 8'
   ].obs;
 
-  void getEcosystemData() {}
+  void getUserCardListData() {}
 
-  void loadMoreData() {}
+  void loadCardListData() {}
 }
