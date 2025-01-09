@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class EarnAdtApplicationZone extends StatefulWidget {
   EarnAdtApplicationZone({Key? key}) : super(key: key);
@@ -444,34 +445,40 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                          width: 140.w,
-                          height: 40.w,
-                          margin: EdgeInsets.only(right: 15.w),
-                          decoration: BoxDecoration(
-                              color: Color(0XFFD99B21),
-                              borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(
-                                  width: 1.w, color: Color(0XFF000000))),
-                          child: Container(
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed('/card');
+                        },
+                        child: Container(
+                            width: 140.w,
+                            height: 40.w,
+                            margin: EdgeInsets.only(right: 15.w),
                             decoration: BoxDecoration(
+                                color: Color(0XFFD99B21),
                                 borderRadius: BorderRadius.circular(8.r),
-                                border: Border(
-                                    top: BorderSide(
-                                        width: 1.w, color: Color(0XFFFEFFD1)))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Synthesize Now',
-                                  style: TextStyle(
-                                      color: Color(0XFF0D0900),
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
-                            ),
-                          )),
+                                border: Border.all(
+                                    width: 1.w, color: Color(0XFF000000))),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  border: Border(
+                                      top: BorderSide(
+                                          width: 1.w,
+                                          color: Color(0XFFFEFFD1)))),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Synthesize Now',
+                                    style: TextStyle(
+                                        color: Color(0XFF0D0900),
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w700),
+                                  )
+                                ],
+                              ),
+                            )),
+                      ),
                       Container(
                           width: 140.w,
                           height: 40.w,

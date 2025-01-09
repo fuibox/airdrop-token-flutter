@@ -1,6 +1,4 @@
 import 'package:airdrop_flutter/controllers/ecosystem_controller.dart';
-import 'package:airdrop_flutter/ui/assets_deposit_dialog.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -40,7 +38,7 @@ class _EarnEcosystemState extends State<EarnEcosystem> {
           ),
           Column(
             children: controller.ecosystemList.map((item) {
-              int index = controller.ecosystemList.indexOf(item); // 获取索引
+              int index = controller.ecosystemList.indexOf(item);
               return Container(
                 width: 343.w,
                 height: 202.w,
