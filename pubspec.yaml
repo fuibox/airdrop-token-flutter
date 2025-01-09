@@ -84,7 +84,6 @@ dependencies:
   easy_refresh: ^3.4.0
   # cached_network_image: ^3.4.1
 
-
   # 第三方登录
   google_sign_in: ^6.2.2
   flutter_facebook_auth: ^7.1.1
@@ -124,6 +123,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/games/
     - assets/svg/
 
   # To add assets to your application, add an assets section, like this:

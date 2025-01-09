@@ -850,7 +850,6 @@ class _FlashButtonState extends State<FlashButton>
 
   @override
   Widget build(BuildContext context) {
-    print(_animation.value);
     return Stack(
       children: [
         Positioned(
@@ -858,7 +857,7 @@ class _FlashButtonState extends State<FlashButton>
             borderRadius: BorderRadius.all(
               Radius.circular(8.w),
             ),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: AnimatedBuilder(
                 animation: _animation,
