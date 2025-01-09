@@ -12,11 +12,7 @@ class EcosystemController extends GetxController {
     'Item 8'
   ].obs;
 
-  void refreshData() {
-    // ecosystemList.value = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
-  }
+  void getEcosystemData() {}
 
-  void loadMoreData() {
-    // ecosystemList.addAll(['Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10']);
-  }
+  void loadMoreData() {}
 }
