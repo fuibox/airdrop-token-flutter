@@ -1,4 +1,6 @@
 import 'package:airdrop_flutter/controllers/card_list_controller.dart';
+import 'package:airdrop_flutter/ui/card_dialog.dart';
+import 'package:airdrop_flutter/ui/card_send_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -213,62 +215,72 @@ class _CardScreenState extends State<CardScreen> {
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w500),
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Recycle for',
-                                    style: TextStyle(
-                                        color: Color(0XFFCC9533),
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  Image.asset(
-                                    'assets/images/gcc_token.png',
-                                    width: 16.w,
-                                    height: 16.w,
-                                  ),
-                                  Text(
-                                    '>',
-                                    style: TextStyle(
-                                        color: Color(0XFFCC9533),
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500),
-                                  )
-                                ],
+                              InkWell(
+                                onTap: () {
+                                  showCardBox();
+                                },
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Recycle for',
+                                      style: TextStyle(
+                                          color: Color(0XFFCC9533),
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Image.asset(
+                                      'assets/images/gcc_token.png',
+                                      width: 16.w,
+                                      height: 16.w,
+                                    ),
+                                    Text(
+                                      '>',
+                                      style: TextStyle(
+                                          color: Color(0XFFCC9533),
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                ),
                               )
                             ],
                           ),
                         ),
-                        Container(
-                          width: 78.w,
-                          height: 32.w,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.r),
-                              color: Color(0XFFBCC0CC)),
+                        InkWell(
+                          onTap: () {
+                            showCardSendBox();
+                          },
                           child: Container(
+                            width: 78.w,
+                            height: 32.w,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8.r),
-                                border: Border(
-                                    top: BorderSide(
-                                        width: 3.w,
-                                        color: Color(0XFFFFFFFF)
-                                            .withOpacity(0.65)))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/images/card_btn_icon.png',
-                                  width: 16.w,
-                                  height: 16.w,
-                                ),
-                                Text(
-                                  ' Gift',
-                                  style: TextStyle(
-                                      color: Color(0XFF000000),
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
+                                color: Color(0XFFBCC0CC)),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  border: Border(
+                                      top: BorderSide(
+                                          width: 3.w,
+                                          color: Color(0XFFFFFFFF)
+                                              .withOpacity(0.65)))),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/card_btn_icon.png',
+                                    width: 16.w,
+                                    height: 16.w,
+                                  ),
+                                  Text(
+                                    ' Gift',
+                                    style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w700),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         )
