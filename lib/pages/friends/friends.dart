@@ -1,10 +1,15 @@
 import 'dart:ui';
 
+import 'package:airdrop_flutter/pages/friends/backdrop.dart';
 import 'package:airdrop_flutter/pages/friends/bubble.dart';
+import 'package:airdrop_flutter/pages/friends/icon.dart';
+import 'package:airdrop_flutter/pages/friends/inviteLevel.dart';
 import 'package:airdrop_flutter/service/api_service.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
@@ -12,7 +17,7 @@ import 'package:dio/dio.dart' as dio;
 import '../../service/type.dart';
 
 class FriendsScreen extends StatefulWidget {
-  FriendsScreen({Key? key}) : super(key: key);
+  const FriendsScreen({super.key});
 
   @override
   State<FriendsScreen> createState() => _FriendsScreenState();
@@ -21,6 +26,8 @@ class FriendsScreen extends StatefulWidget {
 class _FriendsScreenState extends State<FriendsScreen> {
   UserInfo? userInfo;
   String code = '';
+  late EasyRefreshController _controller;
+
   void onBind() async {
     if (code == '') return;
 
@@ -55,11 +62,10 @@ class _FriendsScreenState extends State<FriendsScreen> {
             barBlur: 1,
             overlayBlur: 1,
           );
+          _controller.callRefresh();
         }
       }
-    } finally {
-      setState(() {});
-    }
+    } finally {}
   }
 
   void onCopy() {
@@ -77,24 +83,87 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
   }
 
+  void onRefresh() async {
+    try {
+      final response = await dioService.getRequest("user/info");
+
+      if (response.statusCode == 200) {
+        UserData userData =
+            UserData.fromJson(response.data as Map<String, dynamic>);
+        setState(() {
+          userInfo = userData.data;
+        });
+      }
+    } finally {
+      _controller.finishRefresh();
+      _controller.resetFooter();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: dioService.getRequest("user/info"),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            dio.Response response = snapshot.data;
+    final hasInviter = userInfo?.hasInviter == 1;
+    final progress = (userInfo?.inviteCount ?? 0.toDouble()) / 100;
 
-            if (response.statusCode == 200) {
-              UserData userData =
-                  UserData.fromJson(response.data as Map<String, dynamic>);
-              userInfo = userData.data;
-            }
-          }
-
-          double progress = (userInfo?.inviteCount ?? 0.toDouble()) / 100;
-          bool hasInviter = userInfo?.hasInviter == 1;
-          return SingleChildScrollView(
+    return EasyRefresh(
+      controller: _controller,
+      refreshOnStart: true,
+      // refreshOnStartHeader: BuilderHeader(
+      //   triggerOffset: 70,
+      //   clamping: true,
+      //   position: IndicatorPosition.above,
+      //   processedDuration: Duration.zero,
+      //   builder: (ctx, state) {
+      //     if (state.mode == IndicatorMode.inactive ||
+      //         state.mode == IndicatorMode.done) {
+      //       return const SizedBox();
+      //     }
+      //     return Container(
+      //       padding: const EdgeInsets.only(bottom: 100),
+      //       width: double.infinity,
+      //       height: state.viewportDimension,
+      //       alignment: Alignment.center,
+      //       child: SpinKitFadingCube(
+      //         size: 24.w,
+      //         // color: themeData.colorScheme.primary,
+      //         color: Colors.white,
+      //       ),
+      //     );
+      //   },
+      // ),
+      header: ClassicHeader(
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+        messageStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+      ),
+      onRefresh: onRefresh,
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
             child: Container(
               width: double.infinity,
               height: hasInviter ? 750.w : 881.w,
@@ -202,13 +271,13 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     ),
                                     Row(
                                       children: [
-                                        Gift(
+                                        GiftIcon(
                                           value: "+1",
                                         ),
                                         Container(
                                           width: 12.w,
                                         ),
-                                        ADT(
+                                        AdtIcon(
                                           value: "+100",
                                         )
                                       ],
@@ -265,7 +334,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 12.w),
-                                          child: Gift(
+                                          child: GiftIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+1",
@@ -281,7 +350,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 4.w),
-                                          child: ADT(
+                                          child: AdtIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+100",
@@ -322,7 +391,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 12.w),
-                                          child: Gift(
+                                          child: GiftIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+1",
@@ -338,7 +407,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 4.w),
-                                          child: ADT(
+                                          child: AdtIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+100",
@@ -379,7 +448,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 12.w),
-                                          child: Gift(
+                                          child: GiftIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+1",
@@ -395,7 +464,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 4.w),
-                                          child: ADT(
+                                          child: AdtIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+100",
@@ -436,7 +505,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 12.w),
-                                          child: Gift(
+                                          child: GiftIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+1",
@@ -452,7 +521,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(top: 4.w),
-                                          child: ADT(
+                                          child: AdtIcon(
                                             imgWidth: 16.w,
                                             imgHeight: 16.w,
                                             value: "+100",
@@ -594,7 +663,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                                     MainAxisAlignment.center,
                                                 spacing: 4.w,
                                                 children: [
-                                                  Gift(
+                                                  GiftIcon(
                                                     imgHeight: 16.w,
                                                     imgWidth: 16.w,
                                                   ),
@@ -686,18 +755,19 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     ],
                                   ),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    "Invite Now",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          const Color.fromRGBO(20, 20, 20, 1),
-                                      fontSize: 16.sp,
-                                      fontFamily: 'Figtree',
-                                    ),
-                                  ),
-                                ),
+                                child: const FlashButton(),
+                                // child: Center(
+                                //   child: Text(
+                                //     "Invite Now",
+                                //     style: TextStyle(
+                                //       fontWeight: FontWeight.w700,
+                                //       color:
+                                //           const Color.fromRGBO(20, 20, 20, 1),
+                                //       fontSize: 16.sp,
+                                //       fontFamily: 'Figtree',
+                                //     ),
+                                //   ),
+                                // ),
                               ),
                             ),
                             InkWell(
@@ -737,191 +807,90 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 ],
               ),
             ),
-          );
-        });
-  }
-}
-
-// ignore: must_be_immutable
-class BoxBackdrop extends StatelessWidget {
-  Widget? child;
-  double? width;
-  double? height;
-
-  BoxBackdrop({super.key, this.child, this.width, this.height});
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(16.w)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12.w, sigmaY: 12.w),
-        child: Container(
-          width: width,
-          height: height,
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(18.w)),
-            border: Border(
-              top: BorderSide(
-                color: const Color.fromRGBO(255, 255, 255, 0.15),
-                width: 2.w,
-              ),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color.fromRGBO(255, 255, 255, 0.15),
-                offset: Offset(0, -2),
-                blurStyle: BlurStyle.inner,
-              ),
-            ],
           ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class InviteLevel extends StatelessWidget {
-  bool? active = false;
-  String? count;
-  String? value;
-  InviteLevel({super.key, this.value, this.active, this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 68.w,
-      child: Column(
-        children: [
-          Image(
-            width: active == true ? 32.w : 20.w,
-            height: active == true ? 32.w : 20.w,
-            image: const AssetImage("assets/images/gift.png"),
-          ),
-          SizedBox(
-            height: 2.w,
-          ),
-          RichText(
-            text: TextSpan(
-              style: TextStyle(
-                fontFamily: 'D-DIN-PRO',
-                fontWeight: FontWeight.w500,
-                fontSize: 12.sp,
-                color: Colors.white,
-              ),
-              children: [
-                TextSpan(
-                  text: "${count ?? 0} ",
-                ),
-                TextSpan(
-                  text: 'invites',
-                  style: TextStyle(
-                    fontFamily: "Figtree",
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12.sp,
-                    color: const Color.fromRGBO(255, 255, 255, 0.65),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: 36.w,
-            height: 18.w,
-            margin: EdgeInsets.only(
-              top: 4.w,
-            ),
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(115, 71, 40, 0.45),
-              borderRadius: BorderRadius.all(
-                Radius.circular(20.w),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                value ?? "",
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12.sp,
-                  fontFamily: 'Figtree',
-                  color: Color.fromRGBO(204, 157, 63, 1),
-                ),
-              ),
-            ),
-          )
         ],
       ),
     );
   }
 }
 
-// ignore: must_be_immutable
-class Gift extends StatelessWidget {
-  double? imgWidth = 24.w;
-  double? imgHeight = 24.w;
-  String? value = "";
-  TextStyle? textStyle;
-  Gift({super.key, this.imgWidth, this.imgHeight, this.value, this.textStyle});
+class FlashButton extends StatefulWidget {
+  const FlashButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          margin: EdgeInsets.only(right: 4.w),
-          child: Image(
-            width: imgWidth ?? 24.w,
-            height: imgHeight ?? 24.w,
-            image: const AssetImage("assets/images/gift.png"),
-          ),
-        ),
-        Text(
-          value ?? "",
-          style: textStyle ??
-              TextStyle(
-                fontFamily: "D-DIN-PRO",
-                fontWeight: FontWeight.w700,
-                fontSize: 18.sp,
-                color: const Color(0XFFE5B045),
-              ),
-        )
-      ],
-    );
-  }
+  State<FlashButton> createState() => _FlashButtonState();
 }
 
-class ADT extends StatelessWidget {
-  double? imgWidth = 22.w;
-  double? imgHeight = 22.w;
-  String? value = "";
-  TextStyle? textStyle;
-  ADT({super.key, this.imgWidth, this.imgHeight, this.value, this.textStyle});
+class _FlashButtonState extends State<FlashButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat();
+
+    _animation = Tween<double>(begin: -1.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    print(_animation.value);
+    return Stack(
       children: [
-        Container(
-          margin: EdgeInsets.only(right: 4.w),
-          child: Image(
-            width: imgWidth ?? 22.w,
-            height: imgHeight ?? 22.w,
-            image: const AssetImage("assets/images/adt_token.png"),
+        Positioned(
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(
+              Radius.circular(8.w),
+            ),
+            child: Container(
+              width: double.infinity,
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(_animation.value * 285.w, 0),
+                    child: ClipRRect(
+                      child: Image.asset(
+                        "assets/images/yellow-flash.png",
+                        height: 44.w,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
-        Text(
-          value ?? "",
-          style: textStyle ??
-              TextStyle(
-                fontFamily: "D-DIN-PRO",
+        Positioned(
+          child: Center(
+            child: Text(
+              "Invite Now",
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
-                fontSize: 18.sp,
-                color: const Color(0XFFE5B045),
+                color: const Color.fromRGBO(20, 20, 20, 1),
+                fontSize: 16.sp,
+                fontFamily: 'Figtree',
               ),
-        )
+            ),
+          ),
+        ),
       ],
     );
   }
