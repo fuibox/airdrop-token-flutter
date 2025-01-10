@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/pages/golden-treasure/golden-treasure.dart';
 import 'package:airdrop_flutter/pages/home/home_assets_details.dart';
 import 'package:fluro/fluro.dart';
 import 'package:get/get.dart';
@@ -27,6 +28,7 @@ class AppPages {
   static const String assets = '/assets';
   static const String ranking = '/ranking';
   static const String record = '/record';
+  static const String goldenTreasure = "/golden-treasure";
 
   static final routes = [
     GetPage(name: home, page: () => HomeScreen()),
@@ -41,6 +43,7 @@ class AppPages {
     GetPage(name: assets, page: () => HomeAssetsDetailsScreen()),
     GetPage(name: ranking, page: () => HomeLeaderboardScreen()),
     GetPage(name: record, page: () => HomeAssetsRecordlistScreen()),
+    GetPage(name: goldenTreasure, page: () => GoldenTreasureScreen()),
   ];
 
   static void configureRoutes(FluroRouter router) {

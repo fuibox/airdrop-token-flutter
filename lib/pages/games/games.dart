@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,11 +12,14 @@ class GamesScreen extends StatefulWidget {
 }
 
 class _GamesScreenState extends State<GamesScreen> {
+  void gotoGoldenTreasure() {
+    Get.toNamed(AppPages.goldenTreasure);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        // height: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/halo_bg.png"),
@@ -66,46 +70,49 @@ class _GamesScreenState extends State<GamesScreen> {
             Row(
               spacing: 20.w,
               children: [
-                Container(
-                  width: 96.w,
-                  height: 96.w,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(16.w),
-                    ),
-                    image: const DecorationImage(
-                      image: AssetImage("assets/images/WinBigPrize.jpg"),
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        child: Image(
-                          width: 48.w,
-                          height: 24.w,
-                          image: const AssetImage("assets/images/new.png"),
-                        ),
+                InkWell(
+                  onTap: gotoGoldenTreasure,
+                  child: Container(
+                    width: 96.w,
+                    height: 96.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(16.w),
                       ),
-                      Positioned(
-                          left: 12.w,
-                          bottom: 12.w,
-                          child: Text(
-                            "Win Big Prize".tr,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12.sp,
-                                color: Colors.white,
-                                shadows: const [
-                                  Shadow(
-                                    offset: Offset(1, 1),
-                                    blurRadius: 0.0,
-                                    color: Colors.black,
-                                  ),
-                                ]),
-                          ))
-                    ],
+                      image: const DecorationImage(
+                        image: AssetImage("assets/images/WinBigPrize.jpg"),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Image(
+                            width: 48.w,
+                            height: 24.w,
+                            image: const AssetImage("assets/images/new.png"),
+                          ),
+                        ),
+                        Positioned(
+                            left: 12.w,
+                            bottom: 12.w,
+                            child: Text(
+                              "Win Big Prize".tr,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.sp,
+                                  color: Colors.white,
+                                  shadows: const [
+                                    Shadow(
+                                      offset: Offset(1, 1),
+                                      blurRadius: 0.0,
+                                      color: Colors.black,
+                                    ),
+                                  ]),
+                            ))
+                      ],
+                    ),
                   ),
                 ),
                 Container(
