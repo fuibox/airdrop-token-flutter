@@ -232,7 +232,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                     top: 280.w,
                     left: 16.w,
                     child: Column(
-                      // spacing: 12.w,
+                      spacing: 12.w,
                       children: [
                         BoxBackdrop(
                           width: 343.w,
@@ -730,7 +730,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                           ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          // spacing: 10.w,
+                          spacing: 10.w,
                           children: [
                             InkWell(
                               onTap: () {},
