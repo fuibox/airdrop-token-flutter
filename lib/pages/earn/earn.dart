@@ -188,7 +188,7 @@ class _EarnScreenState extends State<EarnScreen> {
                             width: 138.w,
                             height: 44.w,
                             decoration: BoxDecoration(
-                                gradient: LinearGradient(
+                                gradient: const LinearGradient(
                                   colors: [
                                     Color(0XFFFB801F),
                                     Color(0XFFD167E5)
