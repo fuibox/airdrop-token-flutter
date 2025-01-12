@@ -1,4 +1,5 @@
 import 'package:airdrop_flutter/ui/coutdownTime.dart';
+import 'package:airdrop_flutter/ui/task_pledge_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -128,38 +129,44 @@ class _Web3TasksScreenState extends State<Web3TasksScreen> {
                                       fontWeight: FontWeight.w700,
                                       fontFamily: 'D-DIN-PRO'),
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 40.w),
-                                  width: 120.w,
-                                  height: 32.w,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      color: Color(0XFFD99B21)),
+                                InkWell(
+                                  onTap: () {
+                                    showBottomPledge();
+                                  },
                                   child: Container(
+                                    margin: EdgeInsets.only(left: 40.w),
+                                    width: 120.w,
+                                    height: 32.w,
                                     decoration: BoxDecoration(
                                         borderRadius:
                                             BorderRadius.circular(8.r),
-                                        border: Border(
-                                            top: BorderSide(
-                                                width: 2.w,
-                                                color: Color(0XFFFEFFD1)
-                                                    .withOpacity(0.65)))),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Join Now',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 14.sp,
-                                              fontFamily: 'Figtree',
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
+                                        color: Color(0XFFD99B21)),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          border: Border(
+                                              top: BorderSide(
+                                                  width: 2.w,
+                                                  color: Color(0XFFFEFFD1)
+                                                      .withOpacity(0.65)))),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Join Now',
+                                            style: TextStyle(
+                                                color: Color(0XFF000000),
+                                                fontSize: 14.sp,
+                                                fontFamily: 'Figtree',
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),
