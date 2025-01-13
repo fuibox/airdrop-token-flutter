@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,6 +11,9 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
+    var phone;
+    var code;
+    var zone;
 
     return Scaffold(
       appBar: null,
@@ -167,6 +173,8 @@ class LoginScreen extends StatelessWidget {
                                         onChanged: (country) {
                                           loginController.areaCode.value =
                                               country.dialCode!;
+                                          AppLogger.instance
+                                              .d(loginController.areaCode);
                                         },
                                       ),
                                       Padding(
@@ -191,6 +199,7 @@ class LoginScreen extends StatelessWidget {
                             onChanged: (value) {
                               // update phone
                               loginController.setPhoneNumber(value);
+                              AppLogger.instance.d(loginController.phoneNumber);
                             },
                             controller: TextEditingController(
                                 text: loginController.phoneNumber.value),
@@ -257,11 +266,12 @@ class LoginScreen extends StatelessWidget {
                                 Expanded(
                                   child: TextField(
                                     onChanged: (value) {
-                                      // loginController.setOtp(value);
+                                      loginController.setOtp(value);
+                                      AppLogger.instance.d(loginController.otp);
                                     },
                                     cursorColor: Color(0xFFCC9533),
-                                    controller: TextEditingController(
-                                        text: loginController.otp.value),
+                                    // controller: TextEditingController(
+                                    //     text: loginController.otp.value),
                                     decoration: InputDecoration(
                                       hintText: "",
                                       border: InputBorder.none,
@@ -277,7 +287,7 @@ class LoginScreen extends StatelessWidget {
                                     onTap: loginController.isButtonEnabled
                                         ? () {
                                             // 获取验证码
-                                            loginController.startCountdown();
+                                            loginController.sendSmsCode();
                                           }
                                         : null,
                                     child: Text(
@@ -318,6 +328,7 @@ class LoginScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         loginController.submitLogin();
+                        Get.back();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD99621),

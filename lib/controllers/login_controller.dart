@@ -1,13 +1,28 @@
+import 'package:airdrop_flutter/service/api_service.dart';
+import 'package:airdrop_flutter/service/api_user_service.dart';
+import 'package:airdrop_flutter/utils/logger.dart';
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'dart:async';
 
 class LoginController extends GetxController {
-  // 手机号和验证码的控制器
+  // 手机号
   var phoneNumber = ''.obs;
+  // 验证码
   var otp = ''.obs;
 
-  //默认区号
+  //区号
   var areaCode = '+1'.obs;
+
+  // token
+  var token = ''.obs;
+
+  // 按钮是否可用
+  // var isButtonEnabled = true.obs;
+  // 表示登录是否成功
+  var isLoginSuccess = false.obs;
+  // 存储登录相关的错误信息
+  var loginError = ''.obs;
 
   // 获取验证码倒计时状态
   var _countdown = 60.obs;
@@ -42,9 +57,64 @@ class LoginController extends GetxController {
     otp.value = otpCode;
   }
 
-  // 提交登录
-  void submitLogin() {
-    print('手机号: ${phoneNumber.value}');
-    print('验证码: ${otp.value}');
+  // 短信验证码
+  Future<void> sendSmsCode() async {
+    try {
+      if (phoneNumber.value.isEmpty) {
+        loginError.value = '请输入手机号码';
+        return;
+      }
+      final response = await userService.loginWithSms(
+          areaCode.value, phoneNumber.value, otp.value);
+      if (response.statusCode == 200) {
+        // 假设接口返回200表示成功发送验证码，这里可以根据实际接口返回数据做更具体处理
+        startCountdown();
+      } else {
+        loginError.value = '发送短信验证码失败，请稍后重试';
+      }
+    } catch (e) {
+      loginError.value = '网络异常，请检查网络连接';
+      print('发送短信验证码出现异常：$e');
+    }
+  }
+
+  // 登录
+  Future<void> submitLogin() async {
+    try {
+      if (phoneNumber.value.isEmpty || otp.value.isEmpty) {
+        loginError.value = '请输入完整的手机号码和验证码';
+        return;
+      }
+      final verifyResponse = await userService.loginVerify(
+          areaCode.value, phoneNumber.value, otp.value);
+      if (verifyResponse.statusCode == 200) {
+        // 登录成功，更新登录成功状态
+        isLoginSuccess.value = true;
+        if (verifyResponse.data != null &&
+            verifyResponse.data['data'] != null &&
+            verifyResponse.data['data']['token'] != null) {
+          token.value = verifyResponse.data['data']['token'];
+          // 设置token到DioService中的dioClient请求头（更新请求拦截器中的token）
+          setAuthorizationToken(token.value);
+        }
+      } else {
+        loginError.value = '登录验证失败，请检查手机号码和验证码是否正确';
+      }
+    } catch (e) {
+      loginError.value = '登录出现异常，请稍后重试';
+      print('登录出现异常：$e');
+    }
+  }
+
+  void setAuthorizationToken(String token) {
+    dioService.dioClient.interceptors.add(InterceptorsWrapper(
+      // 请求拦截器
+      onRequest: (options, handler) {
+        print('Request: ${options.method} ${options.uri}');
+        options.headers['Authorization'] = 'jwt $token';
+        AppLogger.instance.d(options.headers['Authorization']);
+        return handler.next(options);
+      },
+    ));
   }
 }
