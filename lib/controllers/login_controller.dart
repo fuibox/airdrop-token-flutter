@@ -15,10 +15,9 @@ class LoginController extends GetxController {
   var areaCode = '+1'.obs;
 
   // token
+
   var token = ''.obs;
 
-  // 按钮是否可用
-  // var isButtonEnabled = true.obs;
   // 表示登录是否成功
   var isLoginSuccess = false.obs;
   // 存储登录相关的错误信息
@@ -29,6 +28,7 @@ class LoginController extends GetxController {
   var _isButtonEnabled = true.obs;
 
   int get countdown => _countdown.value;
+  // 按钮是否可用
   bool get isButtonEnabled => _isButtonEnabled.value;
 
   // 获取验证码倒计时逻辑
@@ -67,7 +67,6 @@ class LoginController extends GetxController {
       final response = await userService.loginWithSms(
           areaCode.value, phoneNumber.value, otp.value);
       if (response.statusCode == 200) {
-        // 假设接口返回200表示成功发送验证码，这里可以根据实际接口返回数据做更具体处理
         startCountdown();
       } else {
         loginError.value = '发送短信验证码失败，请稍后重试';
@@ -94,7 +93,7 @@ class LoginController extends GetxController {
             verifyResponse.data['data'] != null &&
             verifyResponse.data['data']['token'] != null) {
           token.value = verifyResponse.data['data']['token'];
-          // 设置token到DioService中的dioClient请求头（更新请求拦截器中的token）
+
           setAuthorizationToken(token.value);
         }
       } else {

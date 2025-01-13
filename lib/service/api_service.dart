@@ -21,10 +21,6 @@ class DioService {
       onRequest: (options, handler) {
         print('Request: ${options.method} ${options.uri}');
         //  Token
-        // options.headers['Authorization'] = 'Bearer your-token';
-        // options.headers['Authorization'] =
-        //     "tma query_id=AAHVRDdKAgAAANVEN0or_NxU&user=%7B%22id%22%3A5540103381%2C%22first_name%22%3A%22condi%22%2C%22last_name%22%3A%22wu%22%2C%22username%22%3A%22condiwu%22%2C%22language_code%22%3A%22zh-hans%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FFse2JvWkpdPG4NkdfhaI8ys72ct9TjeWhX_BilIqnsgbU5_j85Kd-5b9sDDPnyXW.svg%22%7D&auth_date=1736323337&signature=-MmkgRIR930dbmJFe3r3X9OE8ehClIt9P4dm4L6W5FmaRxHvcsrxp2OJo-ei4dBs7_GPPmSBDJw8QpcR5fsmAw&hash=4d8893533d9e5a0645615f35b59abdde697459462382e9ea912027d1cbdb265e";
-
         AppLogger.instance.d(options.headers['Authorization']);
 
         return handler.next(options); // next
@@ -45,12 +41,23 @@ class DioService {
   }
 
   // GET 请求方法
-  Future<Response> getRequest(String endpoint) async {
+  Future<Response> getRequest(String endpoint,
+      {Map<String, dynamic>? queryParams}) async {
     try {
-      final response = await dioClient.get(endpoint);
+      Options options = Options(
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
+      if (queryParams != null && queryParams.isNotEmpty) {
+        // 使用 Uri 类构建完整的包含查询参数的 URL
+        Uri uri = Uri.parse(endpoint).replace(queryParameters: queryParams);
+        endpoint = uri.toString();
+      }
+      final response = await dioClient.get(endpoint, options: options);
       return response;
     } catch (e) {
-      rethrow; // 错误捕获
+      rethrow;
     }
   }
 

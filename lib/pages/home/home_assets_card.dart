@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/controllers/user_assets.controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,10 +14,13 @@ class HomeAssetsCardScreen extends StatefulWidget {
 
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   HomeController homeController = Get.put(HomeController());
+  UserAssetsController assetListController = Get.put(UserAssetsController());
 
   @override
   void initState() {
     super.initState();
+    assetListController.UserAssetList();
+    assetListController.UserInfo();
   }
 
   @override

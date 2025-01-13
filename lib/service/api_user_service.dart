@@ -36,8 +36,41 @@ class UserService {
     }
   }
 
-  // // 礼物提示
-  // Future<Response> Usergifts()
+  // 用户信息
+  Future<Response> UserInfo() async {
+    try {
+      final response = await dioService.getRequest('user/info');
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // 修改用户昵称
+  Future<Response> UpdateUserName(String userName) async {
+    try {
+      Map<String, dynamic> queryParams = {
+        'nickName': userName,
+      };
+      final response = await dioService.getRequest('user/update_nickname',
+          queryParams: queryParams);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // 获取礼物提示
+  Future<Response> UserGifts() async {
+    try {
+      final response = await dioService.getRequest('user/my_gifts');
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 final userService = UserService();
