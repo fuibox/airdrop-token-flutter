@@ -1,4 +1,5 @@
 import 'package:airdrop_flutter/controllers/task_answer_controller.dart';
+import 'package:airdrop_flutter/ui/task_correct.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -122,36 +123,42 @@ void showBottomAnswer({String message = 'test'}) {
             ),
           ),
 
-          Container(
-            margin: EdgeInsets.only(left: 0.w),
-            width: 343.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1.w, color: Color(0xff000000)),
-                borderRadius: BorderRadius.circular(8.r),
-                color: Color(0XFFd9d9d9)),
+          InkWell(
+            onTap: () {
+              SmartDialog.dismiss();
+              showBottomCorrect();
+            },
             child: Container(
+              margin: EdgeInsets.only(left: 0.w),
+              width: 343.w,
+              height: 48.w,
               decoration: BoxDecoration(
+                  border: Border.all(width: 1.w, color: Color(0xff000000)),
                   borderRadius: BorderRadius.circular(8.r),
-                  border: Border(
-                      top: BorderSide(
-                          width: 3.w,
-                          color: Color(0XFFFEFFff).withOpacity(0.65)))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Next',
-                    style: TextStyle(
-                        color: Color(0XFF000000),
-                        fontSize: 16.sp,
-                        fontFamily: 'Figtree',
-                        fontWeight: FontWeight.w700),
-                  )
-                ],
+                  color: Color(0XFFd9d9d9)),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border(
+                        top: BorderSide(
+                            width: 3.w,
+                            color: Color(0XFFFEFFff).withOpacity(0.65)))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Next',
+                      style: TextStyle(
+                          color: Color(0XFF000000),
+                          fontSize: 16.sp,
+                          fontFamily: 'Figtree',
+                          fontWeight: FontWeight.w700),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
+          )
         ],
       ),
     ),
