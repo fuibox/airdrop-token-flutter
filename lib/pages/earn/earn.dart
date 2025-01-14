@@ -1,11 +1,13 @@
 import 'package:airdrop_flutter/pages/earn/adt_application_zone.dart';
 import 'package:airdrop_flutter/pages/earn/ecosystem.dart';
 import 'package:airdrop_flutter/ui/earn_airdropbox.dialog.dart';
+import 'package:airdrop_flutter/ui/earn_prizedraw_dialog.dart';
 import 'package:airdrop_flutter/ui/flying.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class EarnScreen extends StatefulWidget {
   EarnScreen({Key? key}) : super(key: key);
@@ -183,47 +185,62 @@ class _EarnScreenState extends State<EarnScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                  width: 138.w,
-                                  height: 44.w,
-                                  margin: EdgeInsets.only(right: 19.w),
-                                  decoration: BoxDecoration(
-                                      color: Color(0XFFD99B21),
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      border: Border.all(
-                                          width: 1.w,
-                                          color: Color(0XFF000000))),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        border: Border(
-                                            top: BorderSide(
-                                                width: 1.w,
-                                                color: Color(0XFFFEFFD1)))),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Draw 1 Time',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
-                                    ),
-                                  )),
                               InkWell(
                                 onTap: () {
-                                  setState(() {
-                                    _showGif = true; // 点击后显示 GIF
-                                    _bottomPosition = MediaQuery.of(context)
-                                        .size
-                                        .height; // 设置从底部到顶部
-                                  });
-                                  print("GIF started flying");
+                                  int param = 10;
+                                  SmartDialog.show(
+                                    alignment: Alignment.topCenter,
+                                    clickMaskDismiss: true,
+                                    usePenetrate: false,
+                                    builder: (_) => FlipCardWidget(
+                                      isSingle: false,
+                                      rows: param == 10 ? 5 : 1, // 如果是10，显示5排
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                    width: 138.w,
+                                    height: 44.w,
+                                    margin: EdgeInsets.only(right: 19.w),
+                                    decoration: BoxDecoration(
+                                        color: Color(0XFFD99B21),
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        border: Border.all(
+                                            width: 1.w,
+                                            color: Color(0XFF000000))),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          border: Border(
+                                              top: BorderSide(
+                                                  width: 1.w,
+                                                  color: Color(0XFFFEFFD1)))),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Draw 1 Time',
+                                            style: TextStyle(
+                                                color: Color(0XFF000000),
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
+                                    )),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  // setState(() {
+                                  //   _showGif = true; // 点击后显示 GIF
+                                  //   _bottomPosition = MediaQuery.of(context)
+                                  //       .size
+                                  //       .height; // 设置从底部到顶部
+                                  // });
+                                  // print("GIF started flying");
                                 },
                                 child: Container(
                                     width: 138.w,
@@ -291,12 +308,12 @@ class _EarnScreenState extends State<EarnScreen> {
                   .animate()
                   .move(
                     begin: const Offset(0, 1),
-                    end: Offset(0, -_screenHeight),
+                    end: Offset(0, -_bottomPosition),
                     duration: 5.seconds,
                     curve: Curves.easeInOut,
                   )
                   .fadeOut(
-                    duration: 5.seconds,
+                    duration: 3.seconds,
                     curve: Curves.easeInOut,
                   ),
             )

@@ -1,6 +1,8 @@
+import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/controllers/user_assets.controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
@@ -15,6 +17,7 @@ class HomeAssetsCardScreen extends StatefulWidget {
 class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   HomeController homeController = Get.put(HomeController());
   UserAssetsController assetListController = Get.put(UserAssetsController());
+  LoginController loginController = Get.put(LoginController());
 
   @override
   void initState() {
@@ -265,44 +268,50 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                width: 309.w,
-                                height: 39.w,
-                                margin: EdgeInsets.only(bottom: 12.w),
-                                decoration: BoxDecoration(
-                                  color: Color(0XFFD99B21),
-                                  borderRadius: BorderRadius.circular(10.r),
-                                  border: Border(
+                              Animate(
+                                autoPlay: true,
+                                onPlay: (controller) => controller.repeat(),
+                                effects: [
+                                  ShimmerEffect(
+                                    color: Color(0xffffdb26),
+                                    duration: Duration(seconds: 2),
+                                    angle: 0,
+                                    curve: Curves.linear,
+                                  ),
+                                ],
+                                child: Container(
+                                  width: 309.w,
+                                  height: 39.w,
+                                  margin: EdgeInsets.only(bottom: 12.w),
+                                  decoration: BoxDecoration(
+                                    color: Color(0XFFD99B21),
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    border: Border(
                                       top: BorderSide(
-                                          width: 2.w,
-                                          color: Color(0xFFFEFFD1))),
-                                  // boxShadow: const [
-                                  //   BoxShadow(
-                                  //     color: Color(0xFFFEFFD1),
-                                  //     offset: Offset(0, -3),
-                                  //     blurRadius: 2,
-                                  //   ),
-                                  // ],
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.only(right: 2.w),
-                                      child: Text(
-                                        'Earn more',
-                                        style: TextStyle(
+                                          width: 2.w, color: Color(0xFFFEFFD1)),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(right: 2.w),
+                                        child: Text(
+                                          'Earn more',
+                                          style: TextStyle(
                                             color: Color(0XFF000000),
                                             fontSize: 14.sp,
-                                            fontWeight: FontWeight.w900),
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    Image.asset(
-                                      'assets/images/adt_icon.png',
-                                      width: 14.w,
-                                      height: 14.w,
-                                    )
-                                  ],
+                                      Image.asset(
+                                        'assets/images/adt_icon.png',
+                                        width: 14.w,
+                                        height: 14.w,
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                               Container(

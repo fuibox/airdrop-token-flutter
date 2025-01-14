@@ -84,7 +84,9 @@ dependencies:
   easy_refresh: ^3.4.0
   flutter_countdown_timer: ^4.1.0
   extended_nested_scroll_view: ^6.2.1
+  flutter_native_splash: ^2.4.4
   # cached_network_image: ^3.4.1
+
 
   # 第三方登录
   google_sign_in: ^6.2.2

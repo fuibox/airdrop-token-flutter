@@ -89,12 +89,15 @@ class LoginController extends GetxController {
       if (verifyResponse.statusCode == 200) {
         // 登录成功，更新登录成功状态
         isLoginSuccess.value = true;
+        isLoginSuccess.refresh(); // 通知界面更新
+
         if (verifyResponse.data != null &&
             verifyResponse.data['data'] != null &&
             verifyResponse.data['data']['token'] != null) {
           token.value = verifyResponse.data['data']['token'];
 
           setAuthorizationToken(token.value);
+          Get.back();
         }
       } else {
         loginError.value = '登录验证失败，请检查手机号码和验证码是否正确';

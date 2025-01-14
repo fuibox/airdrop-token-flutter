@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/widgets/top_nav.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,8 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
 
   @override
   Widget build(BuildContext context) {
+    LoginController loginController = Get.put(LoginController());
+
     return Scaffold(
       body: EasyRefresh.builder(
         header: ClassicHeader(
@@ -78,9 +81,8 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
                       title: Container(
                         width: double.infinity,
                         alignment: Alignment.centerRight,
-                        child: const UserLoginBar(
-                          showLogo: false,
-                        ),
+                        child: UserLoginBar(
+                            showLogo: false, loginController: loginController),
                       ),
                       bottom: PreferredSize(
                         preferredSize: Size.fromHeight(148.w),
