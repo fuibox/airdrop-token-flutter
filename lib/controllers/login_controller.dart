@@ -1,5 +1,7 @@
+import 'package:airdrop_flutter/service/api_assets_service.dart';
 import 'package:airdrop_flutter/service/api_service.dart';
 import 'package:airdrop_flutter/service/api_user_service.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
@@ -90,13 +92,16 @@ class LoginController extends GetxController {
         // 登录成功，更新登录成功状态
         isLoginSuccess.value = true;
         isLoginSuccess.refresh(); // 通知界面更新
+        final storage = Get.find<StorageService>();
+        storage.isLoggedIn.value = true;
 
         if (verifyResponse.data != null &&
             verifyResponse.data['data'] != null &&
             verifyResponse.data['data']['token'] != null) {
           token.value = verifyResponse.data['data']['token'];
+          storage.token.value = verifyResponse.data['data']['token'];
 
-          setAuthorizationToken(token.value);
+          setAuthorizationToken(storage.token.value);
           Get.back();
         }
       } else {
@@ -119,4 +124,49 @@ class LoginController extends GetxController {
       },
     ));
   }
+
+  Future<void> UserConfig() async {
+    try {
+      // 并行请求其他接口
+      final results = await Future.wait([
+        userService.UserInfo(), // 用户信息
+        userAssetsService.AssetsProzePoolList(), // 奖金池
+        userAssetsService.UserAssetList(), // 资产列表
+        userAssetsService.AssetsMyRank(), //我的资产排名
+      ]);
+
+      // 分别处理返回值
+      final userInfo = results[0];
+      final prozePool = results[1];
+      final userAssetsList = results[2];
+      final userRank = results[3];
+
+      // 保存数据到本地或状态管理
+      _saveUserInfo(
+          userInfo as Map<String, dynamic>,
+          prozePool as Map<String, dynamic>,
+          userAssetsList as Map<String, dynamic>,
+          userRank as Map<String, dynamic>);
+    } catch (e) {
+      Get.snackbar('Error', '请求失败，请重试');
+    } finally {}
+  }
+
+  void _saveUserInfo(
+    Map<String, dynamic> userInfo,
+    Map<String, dynamic> prozePool,
+    Map<String, dynamic> userAssetsList,
+    Map<String, dynamic> userRank,
+  ) {
+    // 将数据保存到 Storage
+    final storage = Get.find<StorageService>();
+    storage.userInfo.value = userInfo;
+    storage.balances.value = userAssetsList;
+  }
+
+  // 获取用户信息
+  // 奖金池（流通量）
+  // 流通量
+  // 我的排名
+  // 用户币种列表
 }

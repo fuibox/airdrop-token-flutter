@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,9 +9,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
-    var phone;
-    var code;
-    var zone;
 
     return Scaffold(
       appBar: null,

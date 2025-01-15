@@ -1,6 +1,7 @@
 import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:airdrop_flutter/routes/app_pages.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/global_notifiication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
   final NotificationController notificationController = Get.find();
   LoginController loginController = Get.put(LoginController());
+  final StorageService storage = StorageService();
 
   TopNav({Key? key})
       : preferredSize = Size.fromHeight(102.w),
@@ -68,6 +70,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
 class UserLoginBar extends StatefulWidget {
   final bool showLogo;
   final LoginController loginController;
+  final storage = Get.find<StorageService>();
 
   UserLoginBar(
       {super.key, this.showLogo = true, required this.loginController});
@@ -102,24 +105,26 @@ class _UserLoginBarState extends State<UserLoginBar> {
                 onTap: () {},
                 child: _buildChestButton(),
               ),
-              widget.loginController.isLoginSuccess.value
-                  ? InkWell(
-                      onTap: () {
-                        _toggleUserInfoDialog();
-                      },
-                      child: Image.asset(
-                        'assets/images/user_avatar.png',
-                        width: 28.w,
-                        height: 28.w,
-                      ),
-                    )
-                  : InkWell(
-                      onTap: () {
-                        AppLogger.instance.d('login');
-                        Get.toNamed(AppPages.login);
-                      },
-                      child: _buildLoginButton(),
-                    ),
+              Obx(() {
+                return widget.storage.isLoggedIn.value
+                    ? InkWell(
+                        onTap: () {
+                          _toggleUserInfoDialog();
+                        },
+                        child: Image.asset(
+                          'assets/images/user_avatar.png',
+                          width: 28.w,
+                          height: 28.w,
+                        ),
+                      )
+                    : InkWell(
+                        onTap: () {
+                          AppLogger.instance.d('login');
+                          Get.toNamed(AppPages.login);
+                        },
+                        child: _buildLoginButton(),
+                      );
+              }),
             ],
           ),
         ],

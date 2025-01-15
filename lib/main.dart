@@ -1,4 +1,5 @@
 import 'package:airdrop_flutter/controllers/notification_controller.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -9,13 +10,21 @@ import 'routes/app_pages.dart';
 import 'localization_service.dart';
 import 'routes/route_interceptor.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // 确保 Flutter 绑定初始化
+
   final FluroRouter router = FluroRouter();
 
+  // 初始化路由和拦截器
   AppPages.configureRoutes(router);
-
   RouteInterceptor.configureInterceptor(router);
 
+  // 使用 Get.putAsync 初始化 StorageService
+  await Get.putAsync(() async {
+    final storageService = StorageService();
+    await storageService.onInit();
+    return storageService;
+  });
   Get.put(NotificationController());
 
   runApp(MyApp(router));

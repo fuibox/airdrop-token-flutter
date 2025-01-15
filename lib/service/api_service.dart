@@ -1,5 +1,7 @@
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' hide Response;
 
 class DioService {
   late Dio dioClient;
@@ -21,7 +23,11 @@ class DioService {
       onRequest: (options, handler) {
         print('Request: ${options.method} ${options.uri}');
         //  Token
+        final storage = Get.find<StorageService>();
+        options.headers['Authorization'] = 'jwt ${storage.token.value}';
+
         AppLogger.instance.d(options.headers['Authorization']);
+        AppLogger.instance.d('token:${storage.token.value}');
 
         return handler.next(options); // next
       },
