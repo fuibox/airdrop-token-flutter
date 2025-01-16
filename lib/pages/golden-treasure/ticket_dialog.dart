@@ -17,7 +17,8 @@ import '../../models/wbpactivity.dart';
 
 class TicketDialog extends StatefulWidget {
   final Wbpactivity data;
-  const TicketDialog({super.key, required this.data});
+  final Asset? token;
+  const TicketDialog({super.key, required this.token, required this.data});
 
   @override
   State<StatefulWidget> createState() => _TicketDialogState();
@@ -25,7 +26,7 @@ class TicketDialog extends StatefulWidget {
 
 class _TicketDialogState extends State<TicketDialog> {
   UserAssetsController assetListController = Get.put(UserAssetsController());
-  final storage = Get.find<StorageService>();
+  // final storage = Get.find<StorageService>();
   final gameService = GameService();
 
   final List<int> options = [5, 10];
@@ -65,8 +66,9 @@ class _TicketDialogState extends State<TicketDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final adt = storage.balances["ADT"];
-    final tokenAmount = double.parse(adt.toString());
+    // final adt = storage.balances["ADT"];
+    final token = widget.token;
+    final tokenAmount = double.parse((token?.amount ?? "").toString());
     final assetExpense = double.parse(widget.data.assetExpense);
     final maxJoin = widget.data.maxJoin;
     final curJoin = widget.data.curJoin;
@@ -339,7 +341,7 @@ class _TicketDialogState extends State<TicketDialog> {
                       ),
                     ),
                     AdtIcon(
-                      value: formatter.format(adt).toString(),
+                      value: formatter.format(tokenAmount).toString(),
                       color: Colors.black,
                     )
                   ],

@@ -41,6 +41,7 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
   LoginController loginController = Get.put(LoginController());
   int tabIndex = 0;
   bool initial = false;
+  late Asset token = Asset();
 
   final exampleData = Wbpactivity(
       activityId: 976393,
@@ -99,13 +100,15 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
           final data =
               assetsData.data?.firstWhere((asset) => asset.name == 'ADT');
 
-          if (data?.amount != "") {
-            storage.updateBalance("ADT", double.parse(data!.amount!));
-          }
+          // if (data?.amount != "") {
+          //   storage.updateBalance("ADT", double.parse(data!.amount!));
+          // }
 
-          // setState(() {
-          //   data = assetsData.data!.firstWhere((asset) => asset.name == 'ADT');
-          // });
+          setState(() {
+            if (data != null) {
+              token = data;
+            }
+          });
         }
       } else {}
     } catch (e) {
@@ -463,6 +466,7 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
                                                 controller: _controller,
                                                 sc: _sc,
                                                 loading: false,
+                                                token: token,
                                                 data: liveList.isEmpty
                                                     ? exampleData
                                                     : liveList[index],
@@ -499,6 +503,7 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
                                               child: Card(
                                                 controller: _controller,
                                                 sc: _sc,
+                                                token: token,
                                                 loading: false,
                                                 data: endedList.isEmpty
                                                     ? exampleData
@@ -536,6 +541,7 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
                                             child: Card(
                                               controller: _controller,
                                               sc: _sc,
+                                              token: token,
                                               loading: false,
                                               data: myList.isEmpty
                                                   ? exampleData
@@ -650,6 +656,7 @@ class Card extends StatefulWidget {
   final EasyRefreshController controller;
   final ScrollController sc;
   final Bool? skeletonizer;
+  final Asset? token;
 
   const Card({
     super.key,
@@ -657,6 +664,7 @@ class Card extends StatefulWidget {
     required this.data,
     required this.controller,
     required this.sc,
+    required this.token,
     this.skeletonizer,
   });
 
@@ -693,6 +701,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
     final result = await Get.bottomSheet(
       TicketDialog(
         data: widget.data,
+        token: widget.token,
       ),
       isScrollControlled: true,
       // isDismissible: false,
