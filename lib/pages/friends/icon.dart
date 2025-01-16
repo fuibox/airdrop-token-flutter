@@ -6,19 +6,21 @@ const ADTURL = "assets/images/adt_token.png";
 const GIFTURL = "assets/images/gift.png";
 
 // ignore: must_be_immutable
-class Icon extends StatelessWidget {
+class TokenIcon extends StatelessWidget {
   double? imgWidth = 22.w;
   double? imgHeight = 22.w;
   String imgUrl;
   String? value = "";
   TextStyle? textStyle;
-  Icon(
+  Color? color;
+  TokenIcon(
       {super.key,
       required this.imgUrl,
       this.imgWidth,
       this.imgHeight,
       this.value,
-      this.textStyle});
+      this.textStyle,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class Icon extends StatelessWidget {
                 fontFamily: "D-DIN-PRO",
                 fontWeight: FontWeight.w700,
                 fontSize: 18.sp,
-                color: const Color(0XFFE5B045),
+                color: color ?? const Color(0XFFE5B045),
               ),
         )
       ],
@@ -54,18 +56,25 @@ class AdtIcon extends StatelessWidget {
   double? imgHeight = 22.w;
   String? value = "";
   TextStyle? textStyle;
+  Color? color;
 
   AdtIcon(
-      {super.key, this.imgWidth, this.imgHeight, this.value, this.textStyle});
+      {super.key,
+      this.imgWidth,
+      this.imgHeight,
+      this.value,
+      this.textStyle,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
+    return TokenIcon(
       imgUrl: ADTURL,
       imgHeight: imgHeight,
       imgWidth: imgWidth,
       value: value,
       textStyle: textStyle,
+      color: color,
     );
   }
 }
@@ -76,17 +85,24 @@ class GiftIcon extends StatelessWidget {
   double? imgHeight = 24.w;
   String? value = "";
   TextStyle? textStyle;
+  Color? color;
   GiftIcon(
-      {super.key, this.imgWidth, this.imgHeight, this.value, this.textStyle});
+      {super.key,
+      this.imgWidth,
+      this.imgHeight,
+      this.value,
+      this.textStyle,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
+    return TokenIcon(
       imgUrl: GIFTURL,
       imgHeight: imgHeight,
       imgWidth: imgWidth,
       value: value,
       textStyle: textStyle,
+      color: color,
     );
   }
 }

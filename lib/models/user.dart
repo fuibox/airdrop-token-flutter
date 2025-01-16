@@ -1,16 +1,16 @@
-class UserData {
+class UserModel {
   int code;
   String message;
   UserInfo data;
 
-  UserData({
+  UserModel({
     required this.code,
     required this.message,
     required this.data,
   });
 
-  factory UserData.fromJson(Map<String, dynamic> json) {
-    return UserData(
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
       code: json['code'],
       message: json['message'],
       data: UserInfo.fromJson(json['data']),

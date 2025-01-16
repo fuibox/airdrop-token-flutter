@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:airdrop_flutter/models/user.dart';
 import 'package:airdrop_flutter/pages/friends/backdrop.dart';
 import 'package:airdrop_flutter/pages/friends/bubble.dart';
 import 'package:airdrop_flutter/pages/friends/icon.dart';
@@ -13,8 +14,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
-
-import '../../service/type.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -88,8 +87,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
       final response = await dioService.getRequest("user/info");
 
       if (response.statusCode == 200) {
-        UserData userData =
-            UserData.fromJson(response.data as Map<String, dynamic>);
+        UserModel userData =
+            UserModel.fromJson(response.data as Map<String, dynamic>);
         setState(() {
           userInfo = userData.data;
         });
@@ -103,6 +102,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
   @override
   void initState() {
     super.initState();
+
     _controller = EasyRefreshController(
       controlFinishRefresh: true,
       controlFinishLoad: true,
@@ -123,29 +123,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
     return EasyRefresh(
       controller: _controller,
       refreshOnStart: true,
-      // refreshOnStartHeader: BuilderHeader(
-      //   triggerOffset: 70,
-      //   clamping: true,
-      //   position: IndicatorPosition.above,
-      //   processedDuration: Duration.zero,
-      //   builder: (ctx, state) {
-      //     if (state.mode == IndicatorMode.inactive ||
-      //         state.mode == IndicatorMode.done) {
-      //       return const SizedBox();
-      //     }
-      //     return Container(
-      //       padding: const EdgeInsets.only(bottom: 100),
-      //       width: double.infinity,
-      //       height: state.viewportDimension,
-      //       alignment: Alignment.center,
-      //       child: SpinKitFadingCube(
-      //         size: 24.w,
-      //         // color: themeData.colorScheme.primary,
-      //         color: Colors.white,
-      //       ),
-      //     );
-      //   },
-      // ),
       header: ClassicHeader(
         textStyle: TextStyle(
           color: Colors.white,
@@ -648,7 +625,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                                 borderRadius: BorderRadius.all(
                                                   Radius.circular(8.w),
                                                 ),
-                                                // color: const Color.fromRGBO(255, 255, 255, 0.65),
                                                 gradient: const LinearGradient(
                                                   colors: [
                                                     Color.fromRGBO(

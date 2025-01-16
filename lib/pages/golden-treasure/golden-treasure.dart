@@ -1,13 +1,28 @@
+import 'dart:async';
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:airdrop_flutter/controllers/login_controller.dart';
+import 'package:airdrop_flutter/models/assets.dart';
+import 'package:airdrop_flutter/models/wbpactivity.dart';
+import 'package:airdrop_flutter/pages/friends/icon.dart';
+import 'package:airdrop_flutter/pages/golden-treasure/count_down.dart';
+import 'package:airdrop_flutter/pages/golden-treasure/ticket_dialog.dart';
+import 'package:airdrop_flutter/service/api_assets_service.dart';
+import 'package:airdrop_flutter/service/api_games_service.dart';
+import 'package:airdrop_flutter/service/api_service.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/widgets/top_nav.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:intl/intl.dart';
 
 class GoldenTreasureScreen extends StatefulWidget {
   const GoldenTreasureScreen({super.key});
@@ -18,8 +33,10 @@ class GoldenTreasureScreen extends StatefulWidget {
 
 class _GoldenTreasure extends State<GoldenTreasureScreen>
     with SingleTickerProviderStateMixin {
+  final storage = Get.find<StorageService>();
   late final TabController _tabController;
-  final ScrollController sc = ScrollController();
+  static const LiveKey = Key('Live');
+  LoginController loginController = Get.put(LoginController());
 
   final Rules = [
     "I. The platform will periodically open the Win Big Prize event. ",
@@ -30,323 +47,233 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
     "VI. The lucky player will receive the reward for this Win Big Prize event.",
   ];
 
+  Future<void> UserAssetList() async {
+    try {
+      final response = await userAssetsService.UserAssetList();
+      if (response.statusCode == 200) {
+        AssetsModel assetsData = AssetsModel.fromJson(response.data);
+        if (assetsData.code == 200) {
+          final data =
+              assetsData.data?.firstWhere((asset) => asset.name == 'ADT');
+
+          if (data?.amount != "") {
+            storage.updateBalance("ADT", double.parse(data!.amount!));
+          }
+
+          // setState(() {
+          //   data = assetsData.data!.firstWhere((asset) => asset.name == 'ADT');
+          // });
+        }
+      } else {}
+    } catch (e) {
+      print('asset/list：$e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    UserAssetList();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    LoginController loginController = Get.put(LoginController());
-
     return Scaffold(
-      body: EasyRefresh.builder(
-        header: ClassicHeader(
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Figtree',
-            // fontWeight: FontWeight.w700,
-            fontSize: 16.sp,
-          ),
-          messageStyle: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Figtree',
-            // fontWeight: FontWeight.w700,
-            fontSize: 16.sp,
-          ),
-        ),
-        childBuilder: (context, physics) {
-          return ScrollConfiguration(
-              behavior: const ERScrollBehavior(),
-              child: ExtendedNestedScrollView(
-                physics: physics,
-                onlyOneScrollInBody: true,
-                controller: sc,
-                pinnedHeaderSliverHeightBuilder: () {
-                  return MediaQuery.of(context).padding.top +
-                      kToolbarHeight +
-                      148.w;
-                },
-                headerSliverBuilder: (BuildContext c, bool f) {
-                  return <Widget>[
-                    SliverAppBar(
-                      centerTitle: false,
-                      title: Container(
-                        width: double.infinity,
-                        alignment: Alignment.centerRight,
-                        child: UserLoginBar(
-                            showLogo: false, loginController: loginController),
-                      ),
-                      bottom: PreferredSize(
-                        preferredSize: Size.fromHeight(148.w),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 148.w,
-                                decoration: const BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                      "assets/images/win-big-prize-banner.png",
-                                    ),
-                                  ),
-                                ),
-                                child: UnconstrainedBox(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    width: 140.w,
-                                    padding: EdgeInsets.only(left: 21.w),
-                                    child: Text(
-                                      "Win Big Prize".tr,
-                                      softWrap: true,
-                                      style: TextStyle(
-                                        fontFamily: "Figtree",
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 32.sp,
-                                        color: Colors.white,
-                                        height: 0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      iconTheme: const IconThemeData(color: Colors.white),
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Image.asset(
-                          'assets/images/halo_bg.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ];
-                },
-                body: Container(
+      appBar: AppBar(
+        centerTitle: false,
+        actions: [
+          Container(
+            width: 225.w,
+            alignment: Alignment.centerRight,
+            child: UserLoginBar(
+              showLogo: false,
+              loginController: loginController,
+            ),
+          )
+        ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(148.w),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 148.w,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/images/halo_bg.png'),
-                      fit: BoxFit.cover,
+                      image: AssetImage(
+                        "assets/images/win-big-prize-banner.png",
+                      ),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      TabBar(
-                        controller: _tabController,
-                        dividerHeight: 0,
-                        labelStyle: TextStyle(
+                  child: UnconstrainedBox(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 140.w,
+                      padding: EdgeInsets.only(left: 21.w),
+                      child: Text(
+                        "Win Big Prize".tr,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontFamily: "Figtree",
+                          fontWeight: FontWeight.w900,
+                          fontSize: 32.sp,
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Figtree",
-                          fontSize: 16.sp,
+                          height: 0,
                         ),
-                        unselectedLabelStyle: TextStyle(
-                          color: const Color.fromRGBO(255, 255, 255, 0.6),
-                          fontWeight: FontWeight.w500,
-                          fontFamily: "Figtree",
-                          fontSize: 16.sp,
-                        ),
-                        indicator: BoxDecoration(
-                          // color: Color.fromRGBO(229, 176, 69, 1),
-                          border: Border(
-                            bottom: BorderSide(
-                              color: const Color.fromRGBO(229, 176, 69, 1),
-                              width: 4.w,
-                            ),
-                          ),
-                        ),
-                        tabs: const <Widget>[
-                          Tab(
-                            text: 'Live',
-                          ),
-                          Tab(
-                            text: 'Ended',
-                          ),
-                          Tab(
-                            text: 'Rules',
-                          ),
-                        ],
                       ),
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            ExtendedVisibilityDetector(
-                              uniqueKey: const Key('Live'),
-                              child: ListView.builder(
-                                //store Page state
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.w,
-                                ),
-                                key: const PageStorageKey<String>('Live'),
-                                physics: const ClampingScrollPhysics(),
-                                itemBuilder: (BuildContext c, int i) {
-                                  return BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                        sigmaX: 12.w, sigmaY: 12.w),
-                                    child: Container(
-                                      height: 246.w,
-                                      // padding: EdgeInsets.symmetric(
-                                      //   horizontal: 12.w,
-                                      // ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(16.w),
-                                        ),
-                                        gradient: const LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Color.fromRGBO(61, 54, 64, 1),
-                                            Color.fromRGBO(77, 61, 38, 1),
-                                          ],
-                                        ),
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
-                                            left: 0,
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 73.w,
-                                                  height: 20.w,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(16.w),
-                                                      bottomRight:
-                                                          Radius.circular(10.w),
-                                                    ),
-                                                    gradient:
-                                                        const LinearGradient(
-                                                      colors: [
-                                                        Color.fromRGBO(
-                                                            251, 128, 31, 1),
-                                                        Color.fromRGBO(
-                                                            209, 103, 229, 1),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      "MEME快闪",
-                                                      style: TextStyle(
-                                                        fontFamily: 'Figtree',
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 10.w,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text("#000201",
-                                                    style: TextStyle(
-                                                        fontFamily: ""))
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            width: double.infinity,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 16.w,
-                                            ),
-                                            // color: Colors.red,
-                                            child: Column(),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                itemCount: 1,
-                              ),
-                            ),
-                            ExtendedVisibilityDetector(
-                              uniqueKey: const Key('Ended'),
-                              child: ListView.builder(
-                                //store Page state
-                                key: const PageStorageKey<String>('Ended'),
-                                physics: const ClampingScrollPhysics(),
-                                itemBuilder: (BuildContext c, int i) {
-                                  return Container(
-                                    alignment: Alignment.center,
-                                    height: 60.0,
-                                    child: Text(const Key('Ended').toString() +
-                                        ': ListView$i'),
-                                  );
-                                },
-                                itemCount: 50,
-                              ),
-                            ),
-                            ExtendedVisibilityDetector(
-                              uniqueKey: const Key('Rules'),
-                              child: Container(
-                                // color: Color.fromRGBO(230, 235, 242, 1),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 36.w,
-                                  vertical: 36.w,
-                                ),
-                                child: Column(
-                                  spacing: 12.w,
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.only(
-                                        bottom: 12.w,
-                                      ),
-                                      child: Text(
-                                        "Rules explanation",
-                                        style: TextStyle(
-                                          fontFamily: "Figtree",
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18.sp,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    for (int i = 0; i < Rules.length; i++)
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          Rules[i],
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                            fontFamily: "Figtree",
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 14.sp,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: FlexibleSpaceBar(
+          background: Image.asset(
+            'assets/images/halo_bg.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+      body: SafeArea(
+          child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/halo_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            TabBar(
+              controller: _tabController,
+              dividerHeight: 0,
+              labelStyle: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontFamily: "Figtree",
+                fontSize: 16.sp,
+              ),
+              unselectedLabelStyle: TextStyle(
+                color: const Color.fromRGBO(255, 255, 255, 0.6),
+                fontWeight: FontWeight.w500,
+                fontFamily: "Figtree",
+                fontSize: 16.sp,
+              ),
+              indicator: BoxDecoration(
+                // color: Color.fromRGBO(229, 176, 69, 1),
+                border: Border(
+                  bottom: BorderSide(
+                    color: const Color.fromRGBO(229, 176, 69, 1),
+                    width: 4.w,
                   ),
                 ),
-              ));
-        },
-      ),
+              ),
+              tabs: const <Widget>[
+                Tab(
+                  text: 'Live',
+                ),
+                Tab(
+                  text: 'Ended',
+                ),
+                Tab(
+                  text: 'My',
+                ),
+                Tab(
+                  text: 'Rules',
+                ),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  const ExtendedVisibilityDetector(
+                    uniqueKey: Key('Live'),
+                    child: _AutomaticKeepAlive(
+                      child: RefreshItem(
+                        url: "wbpactivity/list?labelType=3&isJoinOnly=0",
+                      ),
+                    ),
+                  ),
+                  const ExtendedVisibilityDetector(
+                    uniqueKey: Key('Ended'),
+                    child: _AutomaticKeepAlive(
+                      child: RefreshItem(
+                        url: "wbpactivity/list?labelType=2&isJoinOnly=0",
+                      ),
+                    ),
+                  ),
+                  const ExtendedVisibilityDetector(
+                    uniqueKey: Key('My'),
+                    child: _AutomaticKeepAlive(
+                      child: RefreshItem(
+                        url: "wbpactivity/list?labelType=2&isJoinOnly=1",
+                      ),
+                    ),
+                  ),
+                  ExtendedVisibilityDetector(
+                    uniqueKey: const Key('Rules'),
+                    child: Container(
+                      // color: Color.fromRGBO(230, 235, 242, 1),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 36.w,
+                        vertical: 36.w,
+                      ),
+                      child: Column(
+                        spacing: 12.w,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(
+                              bottom: 12.w,
+                            ),
+                            child: Text(
+                              "Rules explanation",
+                              style: TextStyle(
+                                fontFamily: "Figtree",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          for (int i = 0; i < Rules.length; i++)
+                            SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                Rules[i],
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontFamily: "Figtree",
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      )),
     );
   }
 
@@ -386,4 +313,803 @@ class _AutomaticKeepAliveState extends State<_AutomaticKeepAlive>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class RefreshItem extends StatefulWidget {
+  final String url; // 新增 loading 属性
+  const RefreshItem({super.key, required this.url});
+
+  @override
+  State<StatefulWidget> createState() => _RefreshItemState();
+}
+
+class _RefreshItemState extends State<RefreshItem>
+    with SingleTickerProviderStateMixin {
+  late EasyRefreshController _controller;
+  late List<Wbpactivity> list = [];
+  bool canLoadAfterNoMore = false;
+  bool loading = false;
+
+  void onRefreshLive() async {
+    try {
+      setState(() {
+        loading = true;
+      });
+      final response = await dioService.getRequest(widget.url + "&timestamp=0");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          loading = false;
+        });
+        WbpactivityModel wbpactivityData =
+            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (wbpactivityData.code == 200) {
+          setState(() {
+            loading = false;
+            list = wbpactivityData.data;
+            canLoadAfterNoMore = wbpactivityData.data.isEmpty;
+          });
+        }
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      _controller.finishRefresh();
+    }
+  }
+
+  void onLoad() async {
+    try {
+      final response = await dioService.getRequest(
+          "${widget.url}&timestamp=${list[list.length - 1].startUtcTime}");
+
+      if (response.statusCode == 200) {
+        WbpactivityModel wbpactivityData =
+            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (wbpactivityData.code == 200) {
+          setState(() {
+            list = [
+              ...list,
+              ...wbpactivityData.data,
+            ];
+          });
+        }
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      _controller.finishLoad();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return EasyRefresh(
+      controller: _controller,
+      onRefresh: onRefreshLive,
+      refreshOnStart: true,
+      onLoad: onLoad,
+      canLoadAfterNoMore: canLoadAfterNoMore,
+      header: ClassicHeader(
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+        messageStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+      ),
+      footer: ClassicFooter(
+        position: IndicatorPosition.locator,
+        dragText: 'Pull to load'.tr,
+        armedText: 'Release ready'.tr,
+        readyText: 'Loading...'.tr,
+        processingText: 'Loading...'.tr,
+        processedText: 'Succeeded'.tr,
+        noMoreText: 'No more'.tr,
+        failedText: 'Failed'.tr,
+        messageText: 'Last updated at %T'.tr,
+        iconTheme: const IconThemeData(color: Colors.white),
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+        messageStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Figtree',
+          // fontWeight: FontWeight.w700,
+          fontSize: 16.sp,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 12.w,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+              return Container(
+                margin: EdgeInsets.only(
+                  top: index == 0 ? 0 : 12.w,
+                ),
+                child: Card(
+                  controller: _controller,
+                  loading: loading,
+                  data: list[index],
+                ),
+              );
+            }, childCount: list.length ?? 0)),
+            const FooterLocator.sliver(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Card extends StatefulWidget {
+  final bool loading; // 新增 loading 属性
+  final Wbpactivity data;
+  final EasyRefreshController controller;
+
+  const Card(
+      {super.key,
+      required this.loading,
+      required this.data,
+      required this.controller});
+
+  @override
+  State<StatefulWidget> createState() => _CardState();
+}
+
+class _CardState extends State<Card> with SingleTickerProviderStateMixin {
+  final gameService = GameService();
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  late Animation<double> _heightAnimation;
+  late Timer countdownTimer;
+  bool isExpanded = false;
+  bool isStart = false;
+  bool isEnd = false;
+  final formatter = NumberFormat('#,##0.##');
+  late List<dynamic> proof = [];
+
+  void toggleAnimation() {
+    if (isExpanded) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+    setState(() {
+      isExpanded = !isExpanded;
+    });
+  }
+
+  void onParticipate() async {
+    if (!isStart || isEnd) return;
+    final result = await Get.bottomSheet(
+      TicketDialog(
+        data: widget.data,
+      ),
+      isScrollControlled: true,
+      // isDismissible: false,
+    );
+
+    if (result == 'closed') {
+      widget.controller.callRefresh();
+    }
+  }
+
+  void queryProof() async {
+    if (widget.data.buyAmount <= 0) return;
+    final response =
+        await gameService.QueryProof(widget.data.activityId.toString());
+
+    if (response.statusCode == 200) {
+      if (response.data['code'] == 200) {
+        final data = response.data["data"];
+
+        setState(() {
+          proof = data;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0, end: math.pi).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutExpo,
+      ),
+    );
+
+    _heightAnimation =
+        Tween<double>(begin: 0, end: widget.data.buyAmount <= 0 ? 54.w : 108.w)
+            .animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutExpo,
+      ),
+    );
+
+    countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final data = widget.data;
+
+      setState(() {
+        isStart =
+            data.startUtcTime - DateTime.now().millisecondsSinceEpoch <= 0;
+
+        isEnd = data.endUtcTime - DateTime.now().millisecondsSinceEpoch < 0;
+      });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    queryProof();
+  }
+
+  @override
+  void dispose() {
+    countdownTimer.cancel();
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = widget.data;
+    final isMax = data.curJoin == data.maxJoin;
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12.w, sigmaY: 12.w),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16.w),
+            ),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(61, 54, 64, 1),
+                Color.fromRGBO(77, 61, 38, 1),
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0,
+                right: 12.w,
+                top: 0,
+                height: 26.w,
+                child: Row(
+                  mainAxisAlignment: data.isMeme
+                      ? MainAxisAlignment.spaceBetween
+                      : MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (data.isMeme)
+                      Container(
+                        width: 73.w,
+                        height: 20.w,
+                        alignment: Alignment.topLeft,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16.w),
+                            bottomRight: Radius.circular(10.w),
+                          ),
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color.fromRGBO(251, 128, 31, 1),
+                              Color.fromRGBO(209, 103, 229, 1),
+                            ],
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "MEME快闪",
+                            style: TextStyle(
+                              fontFamily: 'Figtree',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10.w,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Text(
+                        "#${data.activityId}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12.sp,
+                          fontFamily: "Figtree",
+                          color: const Color.fromRGBO(255, 255, 255, 0.6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(
+                  left: 16.w,
+                  right: 16.w,
+                  top: 30.w,
+                  bottom: 16.w,
+                ),
+                // color: Colors.red,
+                child: Column(
+                  spacing: 8.w,
+                  children: [
+                    Row(
+                      spacing: 12.w,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image(
+                            width: 80.w,
+                            height: 80.w,
+                            image: NetworkImage("${data?.activityLogo ?? ""}"),
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 80.w,
+                                height: 80.w,
+                              );
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            spacing: 4.w,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(data.activityTitle,
+                                      style: TextStyle(
+                                        fontFamily: "D-DIN-PRO",
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 20.sp,
+                                        color: Colors.white,
+                                      )),
+                                  Text(
+                                    widget.data.buyAmount <= 0
+                                        ? "Not participating"
+                                        : "Participated",
+                                    style: TextStyle(
+                                      color:
+                                          const Color.fromRGBO(229, 176, 69, 1),
+                                      fontSize: 12.sp,
+                                      fontFamily: "Figtree",
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                spacing: 4.w,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    height: 4.w,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(4.w)),
+                                      color: const Color.fromRGBO(0, 0, 0, 0.2),
+                                    ),
+                                    child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                      final w = constraints.minWidth *
+                                          (data.curJoin / data.maxJoin);
+                                      return UnconstrainedBox(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          width: w,
+                                          height: 4.w,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.w)),
+                                            color: const Color.fromRGBO(
+                                                229, 176, 69, 1),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  Text(
+                                    "${data.curJoin}/${data.maxJoin}",
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "D-DIN-PRO",
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (!isStart)
+                                Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "Starts: ",
+                                        style: TextStyle(
+                                          fontFamily: 'Figtree',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Countdown(
+                                        timestamp: data.startUtcTime,
+                                      )
+                                    ],
+                                  ),
+                                )
+                              else if (!isEnd)
+                                Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "Ends: ",
+                                        style: TextStyle(
+                                          fontFamily: 'Figtree',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Countdown(
+                                        timestamp: data.endUtcTime,
+                                      )
+                                    ],
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      color: Color.fromRGBO(255, 255, 255, 0.05),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Ticket",
+                              style: TextStyle(
+                                fontFamily: "Figtree",
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                            AdtIcon(
+                              value: formatter
+                                  .format(double.parse(data.assetExpense)),
+                              color: Colors.white,
+                            )
+                          ],
+                        ),
+                        Row(
+                          spacing: 12.w,
+                          children: [
+                            InkWell(
+                              onTap: onParticipate,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.w),
+                                  ),
+                                ),
+                                child: Container(
+                                  width: 138.w,
+                                  height: 44.w,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: const Color.fromRGBO(
+                                            254, 255, 209, 0.65),
+                                        width: 2.w,
+                                      ),
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.w),
+                                    ),
+                                    gradient: LinearGradient(
+                                      colors: (!isStart || isEnd || isMax)
+                                          ? [
+                                              const Color.fromRGBO(
+                                                  207, 212, 229, 1),
+                                              const Color.fromRGBO(
+                                                  188, 192, 204, 1)
+                                            ]
+                                          : [
+                                              const Color.fromRGBO(
+                                                  229, 175, 69, 1),
+                                              const Color.fromRGBO(
+                                                  217, 155, 33, 1)
+                                            ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "Participate Now",
+                                      style: TextStyle(
+                                        color: (!isStart || isEnd)
+                                            ? const Color.fromRGBO(
+                                                97, 105, 115, 1)
+                                            : Colors.black,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14.sp,
+                                        fontFamily: 'Figtree',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (!widget.loading && isStart && !isEnd)
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.w),
+                                  ),
+                                ),
+                                child: Container(
+                                  width: 44.w,
+                                  height: 44.w,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: const Color.fromRGBO(
+                                            254, 255, 209, 0.65),
+                                        width: 2.w,
+                                      ),
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.w),
+                                    ),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(207, 212, 229, 1),
+                                        Color.fromRGBO(188, 192, 204, 1)
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      "assets/svg/share.svg",
+                                      width: 24.w,
+                                      height: 24.w,
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ],
+                        )
+                      ],
+                    ),
+                    const Divider(
+                      color: Color.fromRGBO(255, 255, 255, 0.05),
+                    ),
+                    InkWell(
+                      onTap: toggleAnimation,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            spacing: 4.w,
+                            children: [
+                              Image(
+                                width: 24.w,
+                                height: 24.w,
+                                image: const AssetImage(
+                                    "assets/images/coupon.png"),
+                              ),
+                              Text(
+                                "Your Proof Of Game",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14.sp,
+                                  fontFamily: 'Figtree',
+                                ),
+                              ),
+                              Text(
+                                "(${widget.data.buyAmount})",
+                                style: TextStyle(
+                                  color: const Color.fromRGBO(252, 119, 0, 1),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.sp,
+                                  fontFamily: 'D-DIN-PRO',
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 18.w,
+                            height: 18.w,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.w)),
+                                border: Border.all(
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.3),
+                                  width: 1.5.w,
+                                )),
+                            child: Center(
+                              child: AnimatedBuilder(
+                                animation: _controller,
+                                builder: (context, child) {
+                                  return Transform.rotate(
+                                    angle: _animation.value,
+                                    child: child,
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.expand_more,
+                                  color: Colors.white,
+                                  size: 15.w,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: _heightAnimation,
+                      builder: (context, child) {
+                        return Container(
+                          width: double.infinity,
+                          height: _heightAnimation.value,
+                          margin: EdgeInsets.only(top: 6.w),
+                          child: child,
+                        );
+                      },
+                      child: SingleChildScrollView(
+                        child: widget.data.buyAmount <= 0
+                            ? Column(
+                                children: [
+                                  SvgPicture.asset(
+                                    "assets/svg/proof-null.svg",
+                                    width: 40.w,
+                                    height: 40.w,
+                                  ),
+                                  Text(
+                                    "No proof".tr,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(255, 255, 255, 0.6),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : Wrap(
+                                spacing: 17.5.w,
+                                runSpacing: 12.w,
+                                children: List.generate(
+                                  proof.length,
+                                  (index) => SizedBox(
+                                    width: 48.w,
+                                    height: 28.w,
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          bottom: 0,
+                                          left: 0,
+                                          child: SvgPicture.asset(
+                                              "assets/svg/proof-number.svg"),
+                                        ),
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          bottom: 0,
+                                          left: 0,
+                                          child: Center(
+                                            child: Text(
+                                              proof[index].toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: "D-DIN-PRO",
+                                                color: Colors.black,
+                                                fontSize: 14.sp,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String formatRemainingTime(int timestamp) {
+  DateTime now = DateTime.now();
+  DateTime targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  Duration remaining = targetTime.difference(now);
+  if (remaining.inMilliseconds <= 0) {
+    return '00:00:00';
+  }
+  int hours = remaining.inHours;
+  int minutes = remaining.inMinutes.remainder(60);
+  int seconds = remaining.inSeconds.remainder(60);
+  return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 }
