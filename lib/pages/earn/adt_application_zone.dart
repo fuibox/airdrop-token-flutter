@@ -1,3 +1,5 @@
+import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,6 +12,8 @@ class EarnAdtApplicationZone extends StatefulWidget {
 }
 
 class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
+  final storage = Get.find<StorageService>();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,13 +69,15 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                         ],
                       ),
                     ),
-                    Text(
-                      '\$9,999.99999',
-                      style: TextStyle(
-                          color: Color(0xFF141414),
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    Obx(() {
+                      return Text(
+                        '\$${formatNumber(storage.prizePool.value['totalUsdtValue'] ?? 0, decimalPlaces: 4)}',
+                        style: TextStyle(
+                            color: Color(0xFF141414),
+                            fontSize: 32.sp,
+                            fontWeight: FontWeight.w700),
+                      );
+                    }),
                     Container(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -89,13 +95,15 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                                 fontSize: 10.sp,
                                 fontWeight: FontWeight.w500),
                           ),
-                          Text(
-                            '2923123.412',
-                            style: TextStyle(
-                                color: Color(0XFF332E23),
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w700),
-                          )
+                          Obx(() {
+                            return Text(
+                              '${formatNumber(storage.prizePool.value['totalGemSupply'] ?? 0, decimalPlaces: 2)}',
+                              style: TextStyle(
+                                  color: Color(0XFF332E23),
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w700),
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -105,7 +113,7 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                   margin: EdgeInsets.only(top: 8.w),
                   width: 339.w,
                   height: 179.w,
-                  padding: EdgeInsets.only(top: 24.w, left: 26.w),
+                  padding: EdgeInsets.only(top: 24.w, left: 26.w, right: 0.w),
                   decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/images/earn_bg2.png'),
@@ -114,184 +122,201 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        width: 311.w,
-                        height: 82.w,
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(right: 46.w),
-                              child: Column(
-                                children: [
-                                  Row(
+                      Obx(() {
+                        if (storage.prizePool.value['prizeItems']?.isNotEmpty ??
+                            false) {
+                          var prizeItems =
+                              storage.prizePool.value['prizeItems'];
+                          return Container(
+                            width: 311.w,
+                            height: 82.w,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 106.w,
+                                  margin: EdgeInsets.only(right: 30.w),
+                                  child: Column(
                                     children: [
-                                      Image.asset(
-                                        'assets/images/earn_icon5.png',
-                                        width: 14.w,
-                                        height: 14.w,
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 4.w, right: 8.w),
-                                        child: Text(
-                                          'IOTX',
-                                          style: TextStyle(
-                                              color: Color(0XFFFFFFFF),
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                      ),
-                                      Text(
-                                        '12233.23123',
-                                        style: TextStyle(
-                                            color: Color(0XFFE5B045),
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    margin:
-                                        EdgeInsets.only(top: 8.w, bottom: 8.w),
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/earn_icon5.png',
-                                          width: 14.w,
-                                          height: 14.w,
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: 4.w, right: 8.w),
-                                          child: Text(
-                                            'IOTX',
-                                            style: TextStyle(
-                                                color: Color(0XFFFFFFFF),
-                                                fontSize: 10.sp,
-                                                fontWeight: FontWeight.w700),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Image.network(
+                                            '${prizeItems[0]['icon']}',
+                                            width: 14.w,
+                                            height: 14.w,
                                           ),
-                                        ),
-                                        Text(
-                                          '12233.23123',
-                                          style: TextStyle(
-                                              color: Color(0XFFE5B045),
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/earn_icon5.png',
-                                        width: 14.w,
-                                        height: 14.w,
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 4.w, right: 8.w),
+                                            child: Text(
+                                              '${prizeItems[0]['name']}',
+                                              style: TextStyle(
+                                                  color: Color(0XFFFFFFFF),
+                                                  fontSize: 10.sp,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${formatNumber(prizeItems[0]['amount'], decimalPlaces: 2)}',
+                                            style: TextStyle(
+                                                color: Color(0XFFE5B045),
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
                                       ),
                                       Container(
                                         margin: EdgeInsets.only(
-                                            left: 4.w, right: 8.w),
-                                        child: Text(
-                                          'IOTX',
-                                          style: TextStyle(
-                                              color: Color(0XFFFFFFFF),
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.w700),
+                                            top: 8.w, bottom: 8.w),
+                                        child: Row(
+                                          children: [
+                                            Image.network(
+                                              '${prizeItems[2]['icon']}',
+                                              width: 14.w,
+                                              height: 14.w,
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  left: 4.w, right: 8.w),
+                                              child: Text(
+                                                '${prizeItems[2]['name']}',
+                                                style: TextStyle(
+                                                    color: Color(0XFFFFFFFF),
+                                                    fontSize: 10.sp,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ),
+                                            Text(
+                                              '${formatNumber(prizeItems[2]['amount'], decimalPlaces: 2)}',
+                                              style: TextStyle(
+                                                  color: Color(0XFFE5B045),
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w700),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                      Text(
-                                        '12233.23123',
-                                        style: TextStyle(
-                                            color: Color(0XFFE5B045),
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w700),
+                                      Row(
+                                        children: [
+                                          Image.network(
+                                            '${prizeItems[4]['icon']}',
+                                            width: 14.w,
+                                            height: 14.w,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 4.w, right: 8.w),
+                                            child: Text(
+                                              '${prizeItems[4]['name']}',
+                                              style: TextStyle(
+                                                  color: Color(0XFFFFFFFF),
+                                                  fontSize: 10.sp,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${formatNumber(prizeItems[4]['amount'], decimalPlaces: 2)}',
+                                            style: TextStyle(
+                                                color: Color(0XFFE5B045),
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: 106.w,
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Image.network(
+                                            '${prizeItems[1]['icon']}',
+                                            width: 14.w,
+                                            height: 14.w,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(
+                                                left: 4.w, right: 8.w),
+                                            child: Text(
+                                              '${prizeItems[1]['name']}',
+                                              style: TextStyle(
+                                                  color: Color(0XFFFFFFFF),
+                                                  fontSize: 10.sp,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${formatNumber(prizeItems[1]['amount'], decimalPlaces: 2)}',
+                                            style: TextStyle(
+                                                color: Color(0XFFE5B045),
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                            top: 8.w, bottom: 8.w),
+                                        child: Row(
+                                          children: [
+                                            Image.network(
+                                              '${prizeItems[3]['icon']}',
+                                              width: 14.w,
+                                              height: 14.w,
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                  left: 4.w, right: 8.w),
+                                              child: Text(
+                                                '${prizeItems[3]['name']}',
+                                                style: TextStyle(
+                                                    color: Color(0XFFFFFFFF),
+                                                    fontSize: 10.sp,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ),
+                                            Text(
+                                              '${formatNumber(prizeItems[3]['amount'], decimalPlaces: 2)}',
+                                              style: TextStyle(
+                                                  color: Color(0XFFE5B045),
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w700),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 106.w,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/earn_icons.png',
+                                              width: 50.w,
+                                              height: 14.w,
+                                            ),
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),
-                                ],
-                              ),
+                                )
+                              ],
                             ),
-                            Container(
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/earn_icon5.png',
-                                        width: 14.w,
-                                        height: 14.w,
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(
-                                            left: 4.w, right: 8.w),
-                                        child: Text(
-                                          'IOTX',
-                                          style: TextStyle(
-                                              color: Color(0XFFFFFFFF),
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                      ),
-                                      Text(
-                                        '12233.23123',
-                                        style: TextStyle(
-                                            color: Color(0XFFE5B045),
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    margin:
-                                        EdgeInsets.only(top: 8.w, bottom: 8.w),
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/earn_icon5.png',
-                                          width: 14.w,
-                                          height: 14.w,
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                              left: 4.w, right: 8.w),
-                                          child: Text(
-                                            'IOTX',
-                                            style: TextStyle(
-                                                color: Color(0XFFFFFFFF),
-                                                fontSize: 10.sp,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ),
-                                        Text(
-                                          '12233.23123',
-                                          style: TextStyle(
-                                              color: Color(0XFFE5B045),
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w700),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 116.w,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/earn_icons.png',
-                                          width: 50.w,
-                                          height: 14.w,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                          );
+                        } else {
+                          return Container(
+                            child: Text('Null Data'),
+                          );
+                        }
+                      }),
                       // text
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

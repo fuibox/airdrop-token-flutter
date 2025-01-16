@@ -1,6 +1,8 @@
 import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/controllers/user_assets.controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,12 +20,12 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   HomeController homeController = Get.put(HomeController());
   UserAssetsController assetListController = Get.put(UserAssetsController());
   LoginController loginController = Get.put(LoginController());
+  final storage = Get.find<StorageService>();
 
   @override
   void initState() {
     super.initState();
-    assetListController.UserAssetList();
-    assetListController.UserInfo();
+    // loginController.UserConfig();
   }
 
   @override
@@ -75,13 +77,15 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                 ],
                               ),
                             ),
-                            Text(
-                              '\$9,999.99999',
-                              style: TextStyle(
-                                  color: Color(0xFF141414),
-                                  fontSize: 32.sp,
-                                  fontWeight: FontWeight.w900),
-                            ),
+                            Obx(() {
+                              return Text(
+                                '\$${formatNumber(storage.prizePool.value['totalUsdtValue'] ?? 0, decimalPlaces: 4)}',
+                                style: TextStyle(
+                                    color: Color(0xFF141414),
+                                    fontSize: 32.sp,
+                                    fontWeight: FontWeight.w900),
+                              );
+                            }),
                             Container(
                               width: 154.w,
                               height: 24.w,
@@ -146,13 +150,31 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                       height: 22.w,
                                     ),
                                   ),
-                                  Text(
-                                    '102.0201',
-                                    style: TextStyle(
-                                        color: Color(0xFFEBB946),
-                                        fontSize: 28.sp,
-                                        fontWeight: FontWeight.w900),
-                                  )
+                                  Obx(() {
+                                    // 检查列表是否为空
+                                    if (storage.assetsList.value.isEmpty) {
+                                      return Text(
+                                        '0',
+                                        style: TextStyle(
+                                            color: Color(0xFFEBB946),
+                                            fontSize: 28.sp,
+                                            fontWeight: FontWeight.w900),
+                                      );
+                                    }
+
+                                    // 检查索引是否有效
+                                    final amount = storage.assetsList.value[0]
+                                            ['amount'] ??
+                                        0;
+
+                                    return Text(
+                                      '${formatNumber(amount, decimalPlaces: 2)}',
+                                      style: TextStyle(
+                                          color: Color(0xFFEBB946),
+                                          fontSize: 28.sp,
+                                          fontWeight: FontWeight.w900),
+                                    );
+                                  })
                                 ],
                               ),
                               Container(
@@ -181,13 +203,15 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                           width: 12.w,
                                           height: 12.w,
                                         ),
-                                        Text(
-                                          '29384.94823',
-                                          style: TextStyle(
-                                              color: Color(0xFFEBB946),
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w900),
-                                        )
+                                        Obx(() {
+                                          return Text(
+                                            '${formatNumber(storage.prizePool.value['totalGemSupply'] ?? 0, decimalPlaces: 2)}',
+                                            style: TextStyle(
+                                                color: Color(0xFFEBB946),
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w900),
+                                          );
+                                        })
                                       ],
                                     )
                                   ],
@@ -225,15 +249,17 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                                 fontSize: 12.sp),
                                           ),
                                         ),
-                                        Container(
-                                          child: Text(
-                                            '1000+',
-                                            style: TextStyle(
-                                                fontSize: 16.sp,
-                                                color: Color(0xFF000000),
-                                                fontWeight: FontWeight.w900),
-                                          ),
-                                        )
+                                        Obx(() {
+                                          return Container(
+                                            child: Text(
+                                              '${storage.userRank['rank'] ?? 0}+',
+                                              style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  color: Color(0xFF000000),
+                                                  fontWeight: FontWeight.w900),
+                                            ),
+                                          );
+                                        }),
                                       ],
                                     ),
                                     InkWell(
@@ -242,14 +268,26 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                       },
                                       child: Row(
                                         children: [
-                                          Container(
-                                            margin: EdgeInsets.only(right: 2.w),
-                                            child: Image.asset(
-                                              'assets/images/adt_icon.png',
-                                              width: 20.w,
-                                              height: 20.w,
-                                            ),
-                                          ),
+                                          Obx(() {
+                                            // 确保 storage.userRank 不是空，并且包含 'assetIcon'
+                                            if (storage.userRank.isNotEmpty &&
+                                                storage.userRank
+                                                        .value['assetIcon'] !=
+                                                    null) {
+                                              return Container(
+                                                margin:
+                                                    EdgeInsets.only(right: 2.w),
+                                                child: Image.network(
+                                                  '${storage.userRank.value['assetIcon']}', // 确保访问实际值
+                                                  width: 20.w,
+                                                  height: 20.w,
+                                                ),
+                                              );
+                                            } else {
+                                              // 如果 userRank 为空或 assetIcon 不存在，返回一个占位文本
+                                              return const Text('');
+                                            }
+                                          }),
                                           Text(
                                             'Ranking list',
                                             style: TextStyle(
@@ -368,35 +406,55 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Container(
-                                      alignment: Alignment.center,
-                                      width: 40.w,
-                                      height: 16.w,
-                                      decoration: BoxDecoration(
-                                        color: Color(0XFFE5B450),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Color(0x33E5B450),
-                                            offset: Offset(0, -3),
-                                            blurRadius: 2,
+                                    Obx(() {
+                                      // 获取 inviteCount 值
+                                      final inviteCount = storage
+                                              .userInfo.value['inviteCount'] ??
+                                          0;
+
+                                      // 根据 inviteCount 值判断用户等级
+                                      String userLevel;
+                                      if (inviteCount < 5) {
+                                        userLevel = "1";
+                                      } else if (inviteCount < 15) {
+                                        userLevel = "2";
+                                      } else if (inviteCount < 50) {
+                                        userLevel = "3";
+                                      } else if (inviteCount < 100) {
+                                        userLevel = "4";
+                                      } else {
+                                        userLevel = "5";
+                                      }
+                                      return Container(
+                                        alignment: Alignment.center,
+                                        width: 40.w,
+                                        height: 16.w,
+                                        decoration: BoxDecoration(
+                                          color: Color(0XFFE5B450),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(0x33E5B450),
+                                              offset: Offset(0, -3),
+                                              blurRadius: 2,
+                                            ),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(30.r),
+                                          border: Border.all(
+                                            color: Color(0XFFFFDF80),
+                                            width: 2.w,
                                           ),
-                                        ],
-                                        borderRadius:
-                                            BorderRadius.circular(30.r),
-                                        border: Border.all(
-                                          color: Color(0XFFFFDF80),
-                                          width: 2.w,
                                         ),
-                                      ),
-                                      child: Text(
-                                        'LV.6',
-                                        style: TextStyle(
-                                          color: Color(0XFF733A11),
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w900,
+                                        child: Text(
+                                          'LV.${userLevel}',
+                                          style: TextStyle(
+                                            color: Color(0XFF733A11),
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w900,
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    })
                                   ],
                                 ),
                               )
@@ -418,12 +476,14 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                         fontSize: 14.sp),
                                   ),
                                 ),
-                                Text(
-                                  'Felix',
-                                  style: TextStyle(
-                                      color: Color(0XFFFFFFFF),
-                                      fontSize: 14.sp),
-                                )
+                                Obx(() {
+                                  return Text(
+                                    '${storage.userInfo['nickName'] ?? ''}',
+                                    style: TextStyle(
+                                        color: Color(0XFFFFFFFF),
+                                        fontSize: 14.sp),
+                                  );
+                                })
                               ],
                             ),
                             Row(
@@ -431,21 +491,23 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                 Container(
                                   margin: EdgeInsets.only(right: 9.w),
                                   child: Text(
-                                    'Wallet:',
+                                    'User ID:',
                                     style: TextStyle(
                                         color: Color(0X66FFFFFF),
                                         fontSize: 14.sp),
                                   ),
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(right: 4.w),
-                                  child: Text(
-                                    '12312312312',
-                                    style: TextStyle(
-                                        color: Color(0XFFFFFFFF),
-                                        fontSize: 14.sp),
-                                  ),
-                                ),
+                                Obx(() {
+                                  return Container(
+                                    margin: EdgeInsets.only(right: 4.w),
+                                    child: Text(
+                                      '${storage.userInfo['userId'] ?? ''}',
+                                      style: TextStyle(
+                                          color: Color(0XFFFFFFFF),
+                                          fontSize: 14.sp),
+                                    ),
+                                  );
+                                }),
                                 Image.asset(
                                   'assets/images/home_icon_copy.png',
                                   width: 14.w,
