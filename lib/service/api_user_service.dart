@@ -71,6 +71,17 @@ class UserService {
       rethrow;
     }
   }
+
+  // 获取礼物提示
+  Future<Response> UserWinnerCarousel() async {
+    try {
+      final response = await dioService.getRequest('user/winner_carousel');
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 final userService = UserService();

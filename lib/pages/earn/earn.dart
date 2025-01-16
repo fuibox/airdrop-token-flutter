@@ -1,5 +1,6 @@
 import 'package:airdrop_flutter/pages/earn/adt_application_zone.dart';
 import 'package:airdrop_flutter/pages/earn/ecosystem.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/earn_airdropbox.dialog.dart';
 import 'package:airdrop_flutter/ui/earn_prizedraw_dialog.dart';
 import 'package:airdrop_flutter/ui/flying.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 class EarnScreen extends StatefulWidget {
   EarnScreen({Key? key}) : super(key: key);
@@ -20,6 +22,7 @@ class _EarnScreenState extends State<EarnScreen> {
   bool _showGif = false;
   double _bottomPosition = 0.0;
   double _screenHeight = 0;
+  final storage = Get.find<StorageService>();
 
   @override
   void initState() {
@@ -94,15 +97,17 @@ class _EarnScreenState extends State<EarnScreen> {
                                         )
                                       ],
                                     ),
-                                    Container(
-                                      child: Text(
-                                        '32',
-                                        style: TextStyle(
-                                            color: Color(0XFFE5B045),
-                                            fontSize: 20.sp,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                    ),
+                                    Obx(() {
+                                      return Container(
+                                        child: Text(
+                                          '${storage.userLottery.value['opportunity'] ?? 0}',
+                                          style: TextStyle(
+                                              color: Color(0XFFE5B045),
+                                              fontSize: 20.sp,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      );
+                                    }),
                                     Container(
                                         width: 76.w,
                                         height: 28.w,
@@ -309,11 +314,11 @@ class _EarnScreenState extends State<EarnScreen> {
                   .move(
                     begin: const Offset(0, 1),
                     end: Offset(0, -_bottomPosition),
-                    duration: 5.seconds,
+                    duration: Duration(seconds: 5),
                     curve: Curves.easeInOut,
                   )
                   .fadeOut(
-                    duration: 3.seconds,
+                    duration: Duration(seconds: 3),
                     curve: Curves.easeInOut,
                   ),
             )

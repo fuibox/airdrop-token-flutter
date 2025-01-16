@@ -1,8 +1,10 @@
+import 'package:airdrop_flutter/controllers/task_social_controller.dart';
 import 'package:airdrop_flutter/pages/tasks/social_tasks.dart';
 import 'package:airdrop_flutter/pages/tasks/web3_tasks.dart';
 import 'package:airdrop_flutter/ui/task_answer_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class TasksScreen extends StatefulWidget {
   TasksScreen({Key? key}) : super(key: key);
@@ -12,6 +14,14 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
+  final SocialListController taskController = Get.put((SocialListController()));
+
+  @override
+  void initState() {
+    super.initState();
+    taskController.getTaskListData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

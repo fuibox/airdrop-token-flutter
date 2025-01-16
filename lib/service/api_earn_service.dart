@@ -3,11 +3,9 @@ import "api_service.dart";
 
 class EarnService {
   // 获取我的抽奖余额
-  Future<Response> EarnLotteryInfo(String from, String to) async {
+  Future<Response> EarnLotteryInfo() async {
     try {
-      Map<String, dynamic> queryParams = {'from': from, 'to': to};
-      final response =
-          await dioService.getRequest('lottery/info', queryParams: queryParams);
+      final response = await dioService.getRequest('lottery/info');
       return response;
     } catch (e) {
       rethrow;

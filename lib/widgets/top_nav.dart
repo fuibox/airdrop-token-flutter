@@ -3,6 +3,7 @@ import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/global_notifiication.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -12,7 +13,8 @@ import '../utils/logger.dart';
 class TopNav extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
-  final NotificationController notificationController = Get.find();
+  final NotificationController notificationController =
+      Get.put(NotificationController());
   LoginController loginController = Get.put(LoginController());
   final StorageService storage = StorageService();
 
@@ -29,35 +31,57 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
           children: [
             UserLoginBar(loginController: loginController),
             // notifiication
-            Container(
-              child: LoopScrollWidget(
-                items: [
-                  [for (var item in notificationController.items) item],
-                ],
-                itemBuilder: (context, rowIndex, index) {
-                  return Container(
-                    width: 217.w,
-                    height: 22.w,
-                    margin: EdgeInsets.only(right: 8.w),
-                    decoration: BoxDecoration(
-                        color: Color(0X33FFFFFF),
-                        borderRadius: BorderRadius.circular(30.r)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          notificationController.items[index],
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Color(0X66FFFFFF),
-                          ),
+            Obx(() {
+              if (storage.userWinner.value?.isNotEmpty ?? false) {
+                return Container(
+                  child: LoopScrollWidget(
+                    items: [
+                      storage.userWinner.value,
+                    ],
+                    itemBuilder: (context, rowIndex, index) {
+                      return Container(
+                        height: 22.w,
+                        padding: EdgeInsets.only(left: 6.w, right: 6.w),
+                        margin: EdgeInsets.only(right: 8.w),
+                        decoration: BoxDecoration(
+                            color: Color(0X33FFFFFF),
+                            borderRadius: BorderRadius.circular(30.r)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${storage.userWinner.value[index]['wallet']} ',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Color(0XffFFFFFF),
+                              ),
+                            ),
+                            Text(
+                              'just won ',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Color(0XffFFFFFF),
+                              ),
+                            ),
+                            Text(
+                              '${formatNumber(storage.userWinner.value[index]['amount'], decimalPlaces: 4)} ',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Color(0X66FFFFFF),
+                              ),
+                            ),
+                            Image.network(
+                                storage.userWinner.value[index]['icon'])
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            )
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            })
           ],
         ),
       ),
@@ -206,17 +230,19 @@ class _UserLoginBarState extends State<UserLoginBar> {
               height: 22.w,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(left: 0.w),
-            child: Text(
-              '32',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFFFFFFFF),
+          Obx(() {
+            return Padding(
+              padding: EdgeInsets.only(left: 0.w),
+              child: Text(
+                '${widget.storage.userLottery.value['opportunity'] ?? 0}',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFFFFFFFF),
+                ),
               ),
-            ),
-          ),
+            );
+          })
         ],
       ),
     );
@@ -288,14 +314,16 @@ class _UserLoginBarState extends State<UserLoginBar> {
                         fontFamily: 'Figtree',
                         fontWeight: FontWeight.w400),
                   ),
-                  Text(
-                    '28***@gamil.com',
-                    style: TextStyle(
-                        color: Color(0xffffffff).withOpacity(0.8),
-                        fontSize: 14.sp,
-                        fontFamily: 'Figtree',
-                        fontWeight: FontWeight.w400),
-                  )
+                  Obx(() {
+                    return Text(
+                      '${widget.storage.userInfo['email'] ?? ''}',
+                      style: TextStyle(
+                          color: Color(0xffffffff).withOpacity(0.8),
+                          fontSize: 14.sp,
+                          fontFamily: 'Figtree',
+                          fontWeight: FontWeight.w400),
+                    );
+                  })
                 ],
               ),
             ),
@@ -315,14 +343,16 @@ class _UserLoginBarState extends State<UserLoginBar> {
                   ),
                   Row(
                     children: [
-                      Text(
-                        'Felix',
-                        style: TextStyle(
-                            color: Color(0xffffffff).withOpacity(0.8),
-                            fontSize: 14.sp,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w400),
-                      ),
+                      Obx(() {
+                        return Text(
+                          '${widget.storage.userInfo['nickName'] ?? ''}',
+                          style: TextStyle(
+                              color: Color(0xffffffff).withOpacity(0.8),
+                              fontSize: 14.sp,
+                              fontFamily: 'Figtree',
+                              fontWeight: FontWeight.w400),
+                        );
+                      }),
                       Container(
                         margin: EdgeInsets.only(left: 6.w),
                         child: Image.asset(

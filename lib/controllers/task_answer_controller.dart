@@ -8,7 +8,7 @@ class TaskAnswerController extends GetxController {
     'Item 4',
   ].obs;
 
-  void getBasicListData() {}
+  void getTaskList() {}
 
   void loadMoreData() {}
 }
