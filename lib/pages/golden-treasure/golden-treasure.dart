@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:ui';
 import 'dart:math' as math;
 
@@ -34,9 +35,44 @@ class GoldenTreasureScreen extends StatefulWidget {
 class _GoldenTreasure extends State<GoldenTreasureScreen>
     with SingleTickerProviderStateMixin {
   final storage = Get.find<StorageService>();
+  late EasyRefreshController _controller;
+  late ScrollController _sc;
   late final TabController _tabController;
-  static const LiveKey = Key('Live');
   LoginController loginController = Get.put(LoginController());
+  int tabIndex = 0;
+  bool initial = false;
+
+  final exampleData = Wbpactivity(
+      activityId: 976393,
+      activityTitle: "2000 ADT",
+      activityLogo: "https://airdrop-static.jyczg888.uk/wbp/adt-bg.png",
+      awardAssetId: 1,
+      awardAssetName: "ADT",
+      awardAssetIcon:
+          "https://airdrop-static.jyczg888.uk/assets/adt.png?v=1.0.0",
+      awardIconLogo:
+          "https://airdrop-static.jyczg888.uk/assets/adt.png?v=1.0.0",
+      awardAmount: "2000.00000000",
+      curJoin: 0,
+      maxJoin: 10,
+      buyLimit: 10,
+      startUtcTime: 1737023400000,
+      endUtcTime: 1737024000000,
+      assetId: 1,
+      assetIcon: "https://airdrop-static.jyczg888.uk/assets/adt.png?v=1.0.0",
+      assetExpense: "5.00000000",
+      winTgId: null,
+      winNumber: null,
+      isPickup: false,
+      isMeme: false,
+      type: "",
+      isEnd: false,
+      buyAmount: 0);
+
+  static const LiveKey = Key('Live');
+  static const EndedKey = Key('Ended');
+  static const MyKey = Key('My');
+  static const RuleKey = Key('Rules');
 
   final Rules = [
     "I. The platform will periodically open the Win Big Prize event. ",
@@ -46,6 +82,13 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
     "V. A lucky player will be randomly selected from the proof of game entries. ",
     "VI. The lucky player will receive the reward for this Win Big Prize event.",
   ];
+
+  late List<Wbpactivity> liveList = [];
+  late List<Wbpactivity> endedList = [];
+  late List<Wbpactivity> myList = [];
+  String url = "";
+
+  bool hasRefreshed = false;
 
   Future<void> UserAssetList() async {
     try {
@@ -70,210 +113,496 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
     }
   }
 
+  void onRefresh() async {
+    if (tabIndex == 0) {
+      url = "wbpactivity/list?labelType=3&isJoinOnly=0";
+    }
+    if (tabIndex == 1) {
+      url = "wbpactivity/list?labelType=2&isJoinOnly=0";
+    }
+    if (tabIndex == 2) {
+      url = "wbpactivity/list?labelType=2&isJoinOnly=1";
+    }
+    if (tabIndex == 3) {
+      _controller.finishRefresh();
+      return;
+    }
+    try {
+      await UserAssetList();
+      final response = await dioService.getRequest(url + "&timestamp=0");
+
+      if (response.statusCode == 200) {
+        WbpactivityModel wbpactivityData =
+            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (wbpactivityData.code == 200) {
+          setState(() {
+            if (tabIndex == 0) {
+              liveList = wbpactivityData.data;
+            }
+            if (tabIndex == 1) {
+              endedList = wbpactivityData.data;
+            }
+            if (tabIndex == 2) {
+              myList = wbpactivityData.data;
+            }
+          });
+        }
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      _controller.finishRefresh();
+      hasRefreshed = false;
+    }
+  }
+
+  void onLoad() async {
+    try {
+      List<Wbpactivity> list = [];
+      if (tabIndex == 0) {
+        list = liveList;
+      }
+      if (tabIndex == 1) {
+        list = endedList;
+      }
+      if (tabIndex == 2) {
+        list = myList;
+      }
+      final response = await dioService
+          .getRequest("${url}&timestamp=${list[list.length - 1].startUtcTime}");
+
+      if (response.statusCode == 200) {
+        WbpactivityModel wbpactivityData =
+            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (wbpactivityData.code == 200) {
+          setState(() {
+            if (tabIndex == 0) {
+              liveList = [
+                ...liveList,
+                ...wbpactivityData.data,
+              ];
+            }
+            if (tabIndex == 1) {
+              endedList = [
+                ...endedList,
+                ...wbpactivityData.data,
+              ];
+            }
+            if (tabIndex == 2) {
+              myList = [
+                ...myList,
+                ...wbpactivityData.data,
+              ];
+            }
+          });
+        }
+      }
+    } catch (e) {
+      rethrow;
+    } finally {
+      _controller.finishLoad();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _controller = EasyRefreshController(
+      controlFinishRefresh: true,
+      controlFinishLoad: true,
+    );
+    _sc = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
-    UserAssetList();
+    _tabController.addListener(() {
+      if (!hasRefreshed && _tabController.index != 3) {
+        _controller.callRefresh(
+          scrollController: _sc,
+        );
+        hasRefreshed = true;
+      }
+      setState(() {
+        tabIndex = _tabController.index;
+      });
+    });
+
+    Future.delayed(Duration.zero, () {
+      _controller.callRefresh(
+        overOffset: 100.w,
+        scrollController: _sc,
+      );
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        actions: [
-          Container(
-            width: 225.w,
-            alignment: Alignment.centerRight,
-            child: UserLoginBar(
-              showLogo: false,
-              loginController: loginController,
+      body: EasyRefresh.builder(
+          controller: _controller,
+          header: ClassicHeader(
+            safeArea: true,
+            clamping: true,
+            position: IndicatorPosition.locator,
+            textStyle: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Figtree',
+              // fontWeight: FontWeight.w700,
+              fontSize: 16.sp,
             ),
-          )
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(148.w),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.w,
+            iconTheme: const IconThemeData(
+              color: Colors.white,
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 148.w,
+            messageStyle: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Figtree',
+              // fontWeight: FontWeight.w700,
+              fontSize: 16.sp,
+            ),
+          ),
+          footer: ClassicFooter(
+            position: IndicatorPosition.locator,
+            dragText: 'Pull to load'.tr,
+            armedText: 'Release ready'.tr,
+            readyText: 'Loading...'.tr,
+            processingText: 'Loading...'.tr,
+            processedText: 'Succeeded'.tr,
+            noMoreText: 'No more'.tr,
+            failedText: 'Failed'.tr,
+            messageText: 'Last updated at %T'.tr,
+            iconTheme: const IconThemeData(color: Colors.white),
+            messageStyle: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Figtree',
+              // fontWeight: FontWeight.w700,
+              fontSize: 16.sp,
+            ),
+            textStyle: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Figtree',
+              // fontWeight: FontWeight.w700,
+              fontSize: 16.sp,
+            ),
+          ),
+          onRefresh: onRefresh,
+          onLoad: onLoad,
+          refreshOnStart: false,
+          childBuilder: (context, physics) {
+            return ScrollConfiguration(
+              behavior: const ERScrollBehavior(),
+              child: ExtendedNestedScrollView(
+                controller: _sc,
+                floatHeaderSlivers: true,
+                physics: physics,
+                // onlyOneScrollInBody: true,
+                pinnedHeaderSliverHeightBuilder: () {
+                  return MediaQuery.of(context).padding.top + kToolbarHeight;
+                },
+
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return <Widget>[
+                    const HeaderLocator.sliver(
+                      clearExtent: false,
+                    ),
+                    SliverAppBar(
+                      expandedHeight: MediaQuery.of(context).padding.top +
+                          kToolbarHeight +
+                          148.w,
+                      pinned: true,
+                      centerTitle: false,
+                      iconTheme: const IconThemeData(color: Colors.white),
+                      actions: [
+                        Container(
+                          width: 225.w,
+                          alignment: Alignment.centerRight,
+                          child: UserLoginBar(
+                            showLogo: false,
+                            loginController: loginController,
+                          ),
+                        )
+                      ],
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Container(
+                          // height: 148.w,
+                          width: double.infinity,
+                          margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top +
+                                kToolbarHeight,
+                          ),
+                          padding: EdgeInsets.only(
+                            left: 16.w,
+                            right: 16.w,
+                          ),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                bottom: 0,
+                                left: 0,
+                                child: Image(
+                                  width: 343.w,
+                                  // height: 158.w,
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.center,
+                                  image: const AssetImage(
+                                      "assets/images/win-big-prize-banner.png"),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                bottom: 0,
+                                left: 21.87.w,
+                                child: UnconstrainedBox(
+                                  alignment: Alignment.centerLeft,
+                                  child: SizedBox(
+                                    width: 131.84.w,
+                                    child: Text(
+                                      "Win Big Prize".tr,
+                                      softWrap: true,
+                                      style: TextStyle(
+                                        fontFamily: "Figtree",
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 32.sp,
+                                        color: Colors.white,
+                                        height: 0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        centerTitle: false,
+                      ),
+                    ),
+                  ];
+                },
+                body: Container(
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(
-                        "assets/images/win-big-prize-banner.png",
-                      ),
+                      image: AssetImage('assets/images/halo_bg.png'),
+                      fit: BoxFit.fill,
                     ),
                   ),
-                  child: UnconstrainedBox(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: 140.w,
-                      padding: EdgeInsets.only(left: 21.w),
-                      child: Text(
-                        "Win Big Prize".tr,
-                        softWrap: true,
-                        style: TextStyle(
-                          fontFamily: "Figtree",
-                          fontWeight: FontWeight.w900,
-                          fontSize: 32.sp,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      TabBar(
+                        controller: _tabController,
+                        dividerHeight: 0,
+                        labelStyle: TextStyle(
                           color: Colors.white,
-                          height: 0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Figtree",
+                          fontSize: 16.sp,
                         ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        flexibleSpace: FlexibleSpaceBar(
-          background: Image.asset(
-            'assets/images/halo_bg.png',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-      body: SafeArea(
-          child: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/halo_bg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TabBar(
-              controller: _tabController,
-              dividerHeight: 0,
-              labelStyle: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Figtree",
-                fontSize: 16.sp,
-              ),
-              unselectedLabelStyle: TextStyle(
-                color: const Color.fromRGBO(255, 255, 255, 0.6),
-                fontWeight: FontWeight.w500,
-                fontFamily: "Figtree",
-                fontSize: 16.sp,
-              ),
-              indicator: BoxDecoration(
-                // color: Color.fromRGBO(229, 176, 69, 1),
-                border: Border(
-                  bottom: BorderSide(
-                    color: const Color.fromRGBO(229, 176, 69, 1),
-                    width: 4.w,
-                  ),
-                ),
-              ),
-              tabs: const <Widget>[
-                Tab(
-                  text: 'Live',
-                ),
-                Tab(
-                  text: 'Ended',
-                ),
-                Tab(
-                  text: 'My',
-                ),
-                Tab(
-                  text: 'Rules',
-                ),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  const ExtendedVisibilityDetector(
-                    uniqueKey: Key('Live'),
-                    child: _AutomaticKeepAlive(
-                      child: RefreshItem(
-                        url: "wbpactivity/list?labelType=3&isJoinOnly=0",
-                      ),
-                    ),
-                  ),
-                  const ExtendedVisibilityDetector(
-                    uniqueKey: Key('Ended'),
-                    child: _AutomaticKeepAlive(
-                      child: RefreshItem(
-                        url: "wbpactivity/list?labelType=2&isJoinOnly=0",
-                      ),
-                    ),
-                  ),
-                  const ExtendedVisibilityDetector(
-                    uniqueKey: Key('My'),
-                    child: _AutomaticKeepAlive(
-                      child: RefreshItem(
-                        url: "wbpactivity/list?labelType=2&isJoinOnly=1",
-                      ),
-                    ),
-                  ),
-                  ExtendedVisibilityDetector(
-                    uniqueKey: const Key('Rules'),
-                    child: Container(
-                      // color: Color.fromRGBO(230, 235, 242, 1),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 36.w,
-                        vertical: 36.w,
-                      ),
-                      child: Column(
-                        spacing: 12.w,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(
-                              bottom: 12.w,
-                            ),
-                            child: Text(
-                              "Rules explanation",
-                              style: TextStyle(
-                                fontFamily: "Figtree",
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.sp,
-                                color: Colors.white,
-                              ),
+                        unselectedLabelStyle: TextStyle(
+                          color: const Color.fromRGBO(255, 255, 255, 0.6),
+                          fontWeight: FontWeight.w500,
+                          fontFamily: "Figtree",
+                          fontSize: 16.sp,
+                        ),
+                        indicator: BoxDecoration(
+                          // color: Color.fromRGBO(229, 176, 69, 1),
+                          border: Border(
+                            bottom: BorderSide(
+                              color: const Color.fromRGBO(229, 176, 69, 1),
+                              width: 4.w,
                             ),
                           ),
-                          for (int i = 0; i < Rules.length; i++)
-                            SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                Rules[i],
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  fontFamily: "Figtree",
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14.sp,
-                                  color: Colors.white,
+                        ),
+                        tabs: const <Widget>[
+                          Tab(
+                            text: 'Live',
+                          ),
+                          Tab(
+                            text: 'Ended',
+                          ),
+                          Tab(
+                            text: 'My',
+                          ),
+                          Tab(
+                            text: 'Rules',
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            ExtendedVisibilityDetector(
+                              uniqueKey: LiveKey,
+                              child: _AutomaticKeepAlive(
+                                child: CustomScrollView(
+                                  physics: physics,
+                                  slivers: [
+                                    SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        return Container(
+                                          margin: EdgeInsets.only(
+                                            top: index == 0 ? 0 : 12.w,
+                                            left: 16.w,
+                                            right: 16.w,
+                                          ),
+                                          child: Skeletonizer(
+                                              enabled: liveList.isEmpty,
+                                              enableSwitchAnimation: true,
+                                              // ignoreContainers: true,
+                                              child: Card(
+                                                controller: _controller,
+                                                sc: _sc,
+                                                loading: false,
+                                                data: liveList.isEmpty
+                                                    ? exampleData
+                                                    : liveList[index],
+                                              )),
+                                        );
+                                      },
+                                      childCount: liveList.isEmpty
+                                          ? 10
+                                          : liveList.length,
+                                    )),
+                                    const FooterLocator.sliver(),
+                                  ],
                                 ),
                               ),
                             ),
-                        ],
-                      ),
-                    ),
+                            ExtendedVisibilityDetector(
+                              uniqueKey: EndedKey,
+                              child: _AutomaticKeepAlive(
+                                child: CustomScrollView(
+                                  physics: physics,
+                                  slivers: [
+                                    SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        return Container(
+                                          margin: EdgeInsets.only(
+                                            top: index == 0 ? 0 : 12.w,
+                                            left: 16.w,
+                                            right: 16.w,
+                                          ),
+                                          child: Skeletonizer(
+                                              enabled: endedList.isEmpty,
+                                              // ignoreContainers: true,
+                                              child: Card(
+                                                controller: _controller,
+                                                sc: _sc,
+                                                loading: false,
+                                                data: endedList.isEmpty
+                                                    ? exampleData
+                                                    : endedList[index],
+                                              )),
+                                        );
+                                      },
+                                      childCount: endedList.isEmpty
+                                          ? 10
+                                          : endedList.length,
+                                    )),
+                                    const FooterLocator.sliver(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ExtendedVisibilityDetector(
+                              uniqueKey: MyKey,
+                              child: _AutomaticKeepAlive(
+                                child: CustomScrollView(
+                                  physics: physics,
+                                  slivers: [
+                                    SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                            (context, index) {
+                                      return Container(
+                                        margin: EdgeInsets.only(
+                                          top: index == 0 ? 0 : 12.w,
+                                          left: 16.w,
+                                          right: 16.w,
+                                        ),
+                                        child: Skeletonizer(
+                                            enabled: myList.isEmpty,
+                                            // ignoreContainers: true,
+                                            child: Card(
+                                              controller: _controller,
+                                              sc: _sc,
+                                              loading: false,
+                                              data: myList.isEmpty
+                                                  ? exampleData
+                                                  : myList[index],
+                                            )),
+                                      );
+                                    },
+                                            childCount: myList.isEmpty
+                                                ? 10
+                                                : myList.length)),
+                                    const FooterLocator.sliver(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ExtendedVisibilityDetector(
+                              uniqueKey: RuleKey,
+                              child: Container(
+                                // color: Color.fromRGBO(230, 235, 242, 1),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 36.w,
+                                  vertical: 36.w,
+                                ),
+                                child: Column(
+                                  spacing: 12.w,
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.only(
+                                        bottom: 12.w,
+                                      ),
+                                      child: Text(
+                                        "Rules explanation",
+                                        style: TextStyle(
+                                          fontFamily: "Figtree",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    for (int i = 0; i < Rules.length; i++)
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: Text(
+                                          Rules[i],
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            fontFamily: "Figtree",
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14.sp,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                ],
+                ),
               ),
-            )
-          ],
-        ),
-      )),
+            );
+          }),
     );
   }
 
@@ -315,177 +644,21 @@ class _AutomaticKeepAliveState extends State<_AutomaticKeepAlive>
   bool get wantKeepAlive => true;
 }
 
-class RefreshItem extends StatefulWidget {
-  final String url; // 新增 loading 属性
-  const RefreshItem({super.key, required this.url});
-
-  @override
-  State<StatefulWidget> createState() => _RefreshItemState();
-}
-
-class _RefreshItemState extends State<RefreshItem>
-    with SingleTickerProviderStateMixin {
-  late EasyRefreshController _controller;
-  late List<Wbpactivity> list = [];
-  bool canLoadAfterNoMore = false;
-  bool loading = false;
-
-  void onRefreshLive() async {
-    try {
-      setState(() {
-        loading = true;
-      });
-      final response = await dioService.getRequest(widget.url + "&timestamp=0");
-
-      if (response.statusCode == 200) {
-        setState(() {
-          loading = false;
-        });
-        WbpactivityModel wbpactivityData =
-            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
-
-        if (wbpactivityData.code == 200) {
-          setState(() {
-            loading = false;
-            list = wbpactivityData.data;
-            canLoadAfterNoMore = wbpactivityData.data.isEmpty;
-          });
-        }
-      }
-    } catch (e) {
-      rethrow;
-    } finally {
-      _controller.finishRefresh();
-    }
-  }
-
-  void onLoad() async {
-    try {
-      final response = await dioService.getRequest(
-          "${widget.url}&timestamp=${list[list.length - 1].startUtcTime}");
-
-      if (response.statusCode == 200) {
-        WbpactivityModel wbpactivityData =
-            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
-
-        if (wbpactivityData.code == 200) {
-          setState(() {
-            list = [
-              ...list,
-              ...wbpactivityData.data,
-            ];
-          });
-        }
-      }
-    } catch (e) {
-      rethrow;
-    } finally {
-      _controller.finishLoad();
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = EasyRefreshController(
-      controlFinishRefresh: true,
-      controlFinishLoad: true,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return EasyRefresh(
-      controller: _controller,
-      onRefresh: onRefreshLive,
-      refreshOnStart: true,
-      onLoad: onLoad,
-      canLoadAfterNoMore: canLoadAfterNoMore,
-      header: ClassicHeader(
-        textStyle: TextStyle(
-          color: Colors.white,
-          fontFamily: 'Figtree',
-          // fontWeight: FontWeight.w700,
-          fontSize: 16.sp,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        messageStyle: TextStyle(
-          color: Colors.white,
-          fontFamily: 'Figtree',
-          // fontWeight: FontWeight.w700,
-          fontSize: 16.sp,
-        ),
-      ),
-      footer: ClassicFooter(
-        position: IndicatorPosition.locator,
-        dragText: 'Pull to load'.tr,
-        armedText: 'Release ready'.tr,
-        readyText: 'Loading...'.tr,
-        processingText: 'Loading...'.tr,
-        processedText: 'Succeeded'.tr,
-        noMoreText: 'No more'.tr,
-        failedText: 'Failed'.tr,
-        messageText: 'Last updated at %T'.tr,
-        iconTheme: const IconThemeData(color: Colors.white),
-        textStyle: TextStyle(
-          color: Colors.white,
-          fontFamily: 'Figtree',
-          // fontWeight: FontWeight.w700,
-          fontSize: 16.sp,
-        ),
-        messageStyle: TextStyle(
-          color: Colors.white,
-          fontFamily: 'Figtree',
-          // fontWeight: FontWeight.w700,
-          fontSize: 16.sp,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 16.w,
-          vertical: 12.w,
-        ),
-        child: CustomScrollView(
-          slivers: [
-            SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-              return Container(
-                margin: EdgeInsets.only(
-                  top: index == 0 ? 0 : 12.w,
-                ),
-                child: Card(
-                  controller: _controller,
-                  loading: loading,
-                  data: list[index],
-                ),
-              );
-            }, childCount: list.length ?? 0)),
-            const FooterLocator.sliver(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class Card extends StatefulWidget {
   final bool loading; // 新增 loading 属性
   final Wbpactivity data;
   final EasyRefreshController controller;
+  final ScrollController sc;
+  final Bool? skeletonizer;
 
-  const Card(
-      {super.key,
-      required this.loading,
-      required this.data,
-      required this.controller});
+  const Card({
+    super.key,
+    required this.loading,
+    required this.data,
+    required this.controller,
+    required this.sc,
+    this.skeletonizer,
+  });
 
   @override
   State<StatefulWidget> createState() => _CardState();
@@ -507,6 +680,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
     if (isExpanded) {
       _controller.reverse();
     } else {
+      queryProof();
       _controller.forward();
     }
     setState(() {
@@ -525,7 +699,9 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
     );
 
     if (result == 'closed') {
-      widget.controller.callRefresh();
+      widget.controller.callRefresh(
+        scrollController: widget.sc,
+      );
     }
   }
 
@@ -582,11 +758,11 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    queryProof();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   queryProof();
+  // }
 
   @override
   void dispose() {
@@ -776,46 +952,27 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
                                   ),
                                 ],
                               ),
-                              if (!isStart)
-                                Container(
-                                  alignment: Alignment.topLeft,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "Starts: ",
-                                        style: TextStyle(
-                                          fontFamily: 'Figtree',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12.sp,
-                                          color: Colors.white,
-                                        ),
+                              Container(
+                                alignment: Alignment.topLeft,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      !isStart ? "Starts: " : "Ends: ",
+                                      style: TextStyle(
+                                        fontFamily: 'Figtree',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12.sp,
+                                        color: Colors.white,
                                       ),
-                                      Countdown(
-                                        timestamp: data.startUtcTime,
-                                      )
-                                    ],
-                                  ),
-                                )
-                              else if (!isEnd)
-                                Container(
-                                  alignment: Alignment.topLeft,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "Ends: ",
-                                        style: TextStyle(
-                                          fontFamily: 'Figtree',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12.sp,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Countdown(
-                                        timestamp: data.endUtcTime,
-                                      )
-                                    ],
-                                  ),
-                                )
+                                    ),
+                                    Countdown(
+                                      timestamp: isStart
+                                          ? data.startUtcTime
+                                          : data.endUtcTime,
+                                    )
+                                  ],
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -1052,38 +1209,49 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
                                 spacing: 17.5.w,
                                 runSpacing: 12.w,
                                 children: List.generate(
-                                  proof.length,
-                                  (index) => SizedBox(
-                                    width: 48.w,
-                                    height: 28.w,
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
-                                          top: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          left: 0,
-                                          child: SvgPicture.asset(
-                                              "assets/svg/proof-number.svg"),
-                                        ),
-                                        Positioned(
-                                          top: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          left: 0,
-                                          child: Center(
-                                            child: Text(
-                                              proof[index].toString(),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: "D-DIN-PRO",
-                                                color: Colors.black,
-                                                fontSize: 14.sp,
-                                              ),
+                                  proof.isEmpty
+                                      ? widget.data.buyAmount
+                                      : proof.length,
+                                  (index) => Skeletonizer(
+                                    enabled: proof.isEmpty,
+                                    child: Container(
+                                      width: 48.w,
+                                      height: 28.w,
+                                      child: proof.isEmpty
+                                          ? const Text("")
+                                          : Stack(
+                                              children: [
+                                                Positioned(
+                                                  top: 0,
+                                                  right: 0,
+                                                  bottom: 0,
+                                                  left: 0,
+                                                  child: SvgPicture.asset(
+                                                      "assets/svg/proof-number.svg"),
+                                                ),
+                                                Positioned(
+                                                  top: 0,
+                                                  right: 0,
+                                                  bottom: 0,
+                                                  left: 0,
+                                                  child: Center(
+                                                    child: Text(
+                                                      proof.isEmpty
+                                                          ? ""
+                                                          : proof[index]
+                                                              .toString(),
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: "D-DIN-PRO",
+                                                        color: Colors.black,
+                                                        fontSize: 14.sp,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ),
@@ -1099,17 +1267,4 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
       ),
     );
   }
-}
-
-String formatRemainingTime(int timestamp) {
-  DateTime now = DateTime.now();
-  DateTime targetTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  Duration remaining = targetTime.difference(now);
-  if (remaining.inMilliseconds <= 0) {
-    return '00:00:00';
-  }
-  int hours = remaining.inHours;
-  int minutes = remaining.inMinutes.remainder(60);
-  int seconds = remaining.inSeconds.remainder(60);
-  return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 }

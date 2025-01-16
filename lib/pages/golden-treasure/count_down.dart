@@ -12,7 +12,7 @@ class Countdown extends StatefulWidget {
   State<StatefulWidget> createState() => _CountdownState();
 }
 
-class _CountdownState extends State<Countdown> {
+class _CountdownState extends State<Countdown> with TickerProviderStateMixin {
   int remainingTimestamp = 0;
   late Timer countdownTimer;
 
@@ -40,7 +40,7 @@ class _CountdownState extends State<Countdown> {
             DateTime.fromMillisecondsSinceEpoch(remainingTimestamp)
                 .difference(now);
 
-        if (remaining.inMilliseconds <= 0) {
+        if (remaining.inSeconds <= 0) {
           timer.cancel();
           remainingTimestamp = 0;
         } else {
