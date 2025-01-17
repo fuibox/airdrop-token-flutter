@@ -18,12 +18,15 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:intl/intl.dart';
+
+import '../../models/user.dart';
 
 class GoldenTreasureScreen extends StatefulWidget {
   const GoldenTreasureScreen({super.key});
@@ -91,6 +94,20 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
 
   bool hasRefreshed = false;
 
+  Future<void> FetchUserInfo() async {
+    try {
+      final response = await dioService.getRequest("user/info");
+
+      if (response.statusCode == 200) {
+        if (response.data["code"] == 200) {
+          storage.updateUserInfo(response.data['data']);
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> UserAssetList() async {
     try {
       final response = await userAssetsService.UserAssetList();
@@ -116,22 +133,66 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
     }
   }
 
+  Future<dynamic> FetchWbpactivity(String url) async {
+    try {
+      final response = await dioService.getRequest(url);
+
+      if (response.statusCode == 200) {
+        WbpactivityModel wbpactivityData =
+            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (wbpactivityData.code == 200) {
+          return wbpactivityData.data;
+        } else {
+          throw wbpactivityData.message ?? "";
+        }
+      } else {
+        throw response.statusMessage ?? "";
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> onWbpactivity() async {
+    try {
+      await UserAssetList();
+      await FetchUserInfo();
+      final results = await Future.wait([
+        FetchWbpactivity(
+            "wbpactivity/list?labelType=3&isJoinOnly=0&timestamp=0"),
+        FetchWbpactivity(
+            "wbpactivity/list?labelType=2&isJoinOnly=0&timestamp=0"),
+        FetchWbpactivity(
+            "wbpactivity/list?labelType=2&isJoinOnly=1&timestamp=0"),
+      ]);
+
+      setState(() {
+        liveList = results[0];
+        endedList = results[1];
+        myList = results[2];
+      });
+    } catch (e) {
+      Get.snackbar('Error', '请求失败，请重试');
+    } finally {
+      _controller.finishRefresh();
+    }
+  }
+
   void onRefresh() async {
-    if (tabIndex == 0) {
-      url = "wbpactivity/list?labelType=3&isJoinOnly=0";
+    if (liveList.isEmpty && endedList.isEmpty && myList.isEmpty) {
+      await onWbpactivity();
+
+      return;
     }
-    if (tabIndex == 1) {
-      url = "wbpactivity/list?labelType=2&isJoinOnly=0";
-    }
-    if (tabIndex == 2) {
-      url = "wbpactivity/list?labelType=2&isJoinOnly=1";
-    }
+
     if (tabIndex == 3) {
       _controller.finishRefresh();
       return;
     }
     try {
       await UserAssetList();
+      await FetchUserInfo();
       final response = await dioService.getRequest(url + "&timestamp=0");
 
       if (response.statusCode == 200) {
@@ -220,13 +281,16 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
     _sc = ScrollController();
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
-      if (!hasRefreshed && _tabController.index != 3) {
-        _controller.callRefresh(
-          scrollController: _sc,
-        );
-        hasRefreshed = true;
-      }
       setState(() {
+        if (_tabController.index == 0) {
+          url = "wbpactivity/list?labelType=3&isJoinOnly=0";
+        }
+        if (_tabController.index == 1) {
+          url = "wbpactivity/list?labelType=2&isJoinOnly=0";
+        }
+        if (_tabController.index == 2) {
+          url = "wbpactivity/list?labelType=2&isJoinOnly=1";
+        }
         tabIndex = _tabController.index;
       });
     });
@@ -683,6 +747,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
   bool isEnd = false;
   final formatter = NumberFormat('#,##0.##');
   late List<dynamic> proof = [];
+  final storage = Get.find<StorageService>();
 
   void toggleAnimation() {
     if (isExpanded) {
@@ -697,7 +762,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
   }
 
   void onParticipate() async {
-    if (!isStart || isEnd) return;
+    if (!isStart || isEnd || widget.data.curJoin == widget.data.maxJoin) return;
     final result = await Get.bottomSheet(
       TicketDialog(
         data: widget.data,
@@ -723,10 +788,35 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
       if (response.data['code'] == 200) {
         final data = response.data["data"];
 
+        final count = data.length / 5;
+
         setState(() {
           proof = data;
         });
       }
+    }
+  }
+
+  void handlePickup() async {
+    try {
+      SmartDialog.showLoading();
+      final response =
+          await gameService.Pickup(widget.data.activityId.toString());
+
+      if (response.statusCode == 200) {
+        if (response.data['code'] == 200) {
+          SmartDialog.dismiss();
+          SmartDialog.showToast("Claim successful".tr);
+
+          widget.controller.callRefresh(
+            scrollController: widget.sc,
+          );
+        }
+      }
+    } finally {
+      Future.delayed(const Duration(seconds: 1), () {
+        SmartDialog.dismiss();
+      });
     }
   }
 
@@ -746,9 +836,19 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
       ),
     );
 
-    _heightAnimation =
-        Tween<double>(begin: 0, end: widget.data.buyAmount <= 0 ? 54.w : 108.w)
-            .animate(
+    double h = 108.w;
+    if (widget.data.buyAmount <= 0) {
+      h = 54.w;
+    }
+    if (widget.data.buyAmount > 0 && widget.data.buyAmount <= 5) {
+      h = 36.w;
+    }
+
+    if (widget.data.buyAmount > 5 && widget.data.buyAmount <= 10) {
+      h = 68.w;
+    }
+
+    _heightAnimation = Tween<double>(begin: 0, end: h).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOutExpo,
@@ -760,9 +860,11 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
 
       setState(() {
         isStart =
-            data.startUtcTime - DateTime.now().millisecondsSinceEpoch <= 0;
+            data.startUtcTime - DateTime.now().toUtc().millisecondsSinceEpoch <=
+                0;
 
-        isEnd = data.endUtcTime - DateTime.now().millisecondsSinceEpoch < 0;
+        isEnd =
+            data.endUtcTime - DateTime.now().toUtc().millisecondsSinceEpoch < 0;
       });
     });
   }
@@ -785,6 +887,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final data = widget.data;
     final isMax = data.curJoin == data.maxJoin;
+    final userId = storage.userInfo["userId"];
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12.w, sigmaY: 12.w),
@@ -963,24 +1066,32 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
                               ),
                               Container(
                                 alignment: Alignment.topLeft,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      !isStart ? "Starts: " : "Ends: ",
-                                      style: TextStyle(
-                                        fontFamily: 'Figtree',
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12.sp,
-                                        color: Colors.white,
+                                child: widget.data.isEnd
+                                    ? Text(
+                                        "This round of the competition has ended."
+                                            .tr,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: const Color.fromRGBO(
+                                              255, 255, 255, 60),
+                                        ))
+                                    : Row(
+                                        children: [
+                                          Text(
+                                            !isStart ? "Starts: " : "Ends: ",
+                                            style: TextStyle(
+                                              fontFamily: 'Figtree',
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12.sp,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          Countdown(
+                                              timestamp: !isStart
+                                                  ? data.startUtcTime
+                                                  : data.endUtcTime)
+                                        ],
                                       ),
-                                    ),
-                                    Countdown(
-                                      timestamp: isStart
-                                          ? data.startUtcTime
-                                          : data.endUtcTime,
-                                    )
-                                  ],
-                                ),
                               )
                             ],
                           ),
@@ -1015,64 +1126,155 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
                         Row(
                           spacing: 12.w,
                           children: [
-                            InkWell(
-                              onTap: onParticipate,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.black,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8.w),
-                                  ),
-                                ),
-                                child: Container(
-                                  width: 138.w,
-                                  height: 44.w,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      top: BorderSide(
-                                        color: const Color.fromRGBO(
-                                            254, 255, 209, 0.65),
-                                        width: 2.w,
+                            if (widget.data.winTgId != userId &&
+                                widget.data.winNumber != null)
+                              SizedBox(
+                                width: 48.w,
+                                height: 28.w,
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      left: 0,
+                                      child: SvgPicture.asset(
+                                          "assets/svg/proof-number.svg"),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      left: 0,
+                                      child: Center(
+                                        child: Text(
+                                          widget.data.winNumber.toString(),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "D-DIN-PRO",
+                                            color: Colors.black,
+                                            fontSize: 14.sp,
+                                          ),
+                                        ),
                                       ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else if (widget.data.winTgId == userId)
+                              InkWell(
+                                onTap: () {
+                                  if (widget.data.isPickup) {
+                                    // Withdraw /assets?name=${awardAssetName}
+                                  } else {
+                                    handlePickup();
+                                  }
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
                                     ),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(8.w),
                                     ),
-                                    gradient: LinearGradient(
-                                      colors: (!isStart || isEnd || isMax)
-                                          ? [
-                                              const Color.fromRGBO(
-                                                  207, 212, 229, 1),
-                                              const Color.fromRGBO(
-                                                  188, 192, 204, 1)
-                                            ]
-                                          : [
-                                              const Color.fromRGBO(
-                                                  229, 175, 69, 1),
-                                              const Color.fromRGBO(
-                                                  217, 155, 33, 1)
-                                            ],
+                                  ),
+                                  child: Container(
+                                    width: 138.w,
+                                    height: 44.w,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        top: BorderSide(
+                                          color: const Color.fromRGBO(
+                                              254, 255, 209, 0.65),
+                                          width: 2.w,
+                                        ),
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.w),
+                                      ),
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(229, 175, 69, 1),
+                                          Color.fromRGBO(217, 155, 33, 1)
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        widget.data.isPickup
+                                            ? "Withdraw".tr
+                                            : "Claim".tr,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14.sp,
+                                          fontFamily: 'Figtree',
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      "Participate Now",
-                                      style: TextStyle(
-                                        color: (!isStart || isEnd)
-                                            ? const Color.fromRGBO(
-                                                97, 105, 115, 1)
-                                            : Colors.black,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14.sp,
-                                        fontFamily: 'Figtree',
+                                ),
+                              )
+                            else if (widget.data.winNumber == null)
+                              InkWell(
+                                onTap: onParticipate,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8.w),
+                                    ),
+                                  ),
+                                  child: Container(
+                                    width: 138.w,
+                                    height: 44.w,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        top: BorderSide(
+                                          color: const Color.fromRGBO(
+                                              254, 255, 209, 0.65),
+                                          width: 2.w,
+                                        ),
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.w),
+                                      ),
+                                      gradient: LinearGradient(
+                                        colors: (!isStart || isEnd || isMax)
+                                            ? [
+                                                const Color.fromRGBO(
+                                                    207, 212, 229, 1),
+                                                const Color.fromRGBO(
+                                                    188, 192, 204, 1)
+                                              ]
+                                            : [
+                                                const Color.fromRGBO(
+                                                    229, 175, 69, 1),
+                                                const Color.fromRGBO(
+                                                    217, 155, 33, 1)
+                                              ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Participate Now",
+                                        style: TextStyle(
+                                          color: (!isStart || isEnd)
+                                              ? const Color.fromRGBO(
+                                                  97, 105, 115, 1)
+                                              : Colors.black,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14.sp,
+                                          fontFamily: 'Figtree',
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
                             if (!widget.loading && isStart && !isEnd)
                               Container(
                                 decoration: BoxDecoration(
@@ -1223,7 +1425,7 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
                                       : proof.length,
                                   (index) => Skeletonizer(
                                     enabled: proof.isEmpty,
-                                    child: Container(
+                                    child: SizedBox(
                                       width: 48.w,
                                       height: 28.w,
                                       child: proof.isEmpty

@@ -52,9 +52,15 @@ class _TicketDialogState extends State<TicketDialog> {
             barBlur: 1,
             overlayBlur: 1,
           );
+        } else {
+          SmartDialog.dismiss();
+          SmartDialog.showToast(response.data["message"]);
+          Get.back<String>(result: "closed");
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
