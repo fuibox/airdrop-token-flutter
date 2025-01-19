@@ -14,9 +14,12 @@ class TaskService {
   }
 
   // 获取任务进度
-  Future<Response> UserTaskProgress(String taskIds) async {
+  Future<Response> UserTaskProgress({String? taskIds}) async {
     try {
-      Map<String, dynamic> queryParams = {'taskIds': taskIds};
+      Map<String, dynamic> queryParams = {};
+      if (taskIds != null && taskIds.isNotEmpty) {
+        queryParams['taskIds'] = taskIds;
+      }
       final response = await dioService.getRequest('task/progress_list',
           queryParams: queryParams);
       return response;

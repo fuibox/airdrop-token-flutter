@@ -88,36 +88,41 @@ void showBottomCorrect({String message = 'test'}) {
                       fontWeight: FontWeight.w500),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.only(left: 0.w),
-                width: 343.w,
-                height: 48.w,
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1.w, color: Color(0xff000000)),
-                    borderRadius: BorderRadius.circular(8.r),
-                    color: Color(0XFFD99B21)),
+              InkWell(
+                onTap: () {
+                  SmartDialog.dismiss();
+                },
                 child: Container(
+                  margin: EdgeInsets.only(left: 0.w),
+                  width: 343.w,
+                  height: 48.w,
                   decoration: BoxDecoration(
+                      border: Border.all(width: 1.w, color: Color(0xff000000)),
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border(
-                          top: BorderSide(
-                              width: 2.w,
-                              color: Color(0XFFFEFFD1).withOpacity(0.65)))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'To Complete',
-                        style: TextStyle(
-                            color: Color(0XFF000000),
-                            fontSize: 16.sp,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w700),
-                      )
-                    ],
+                      color: Color(0XFFD99B21)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border(
+                            top: BorderSide(
+                                width: 2.w,
+                                color: Color(0XFFFEFFD1).withOpacity(0.65)))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'To Complete',
+                          style: TextStyle(
+                              color: Color(0XFF000000),
+                              fontSize: 16.sp,
+                              fontFamily: 'Figtree',
+                              fontWeight: FontWeight.w700),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              )
             ],
           ),
         )),

@@ -8,7 +8,7 @@ class StorageService extends GetxService {
   static const String _keyAssetsList = 'assets_list'; // 用户币种列表
   static const String _token = ''; // token
   static const String _keyUserRank = 'user_rank'; // 用户排名
-  static const String _keyUserLottery = 'user_lottery'; //用户抽奖
+  static const String _keyUserLottery = 'user_lottery'; //用户抽奖次数
   static const String _keyUserWinner = 'user_winner'; // 用户通知列表
 
   late GetStorage _storage;
@@ -38,11 +38,11 @@ class StorageService extends GetxService {
 
     // 从存储中同步数据到 obs 变量
     isLoggedIn.value = _storage.read<bool>(_keyIsLoggedIn) ?? false;
-    userInfo.value = Map<String, dynamic>.from(
-        _storage.read<Map<String, dynamic>>(_keyUserInfo) ?? {});
     prizePool.value = Map<String, dynamic>.from(
         _storage.read<Map<String, dynamic>>(_keyPrizePool) ?? {});
     userInfo.value = Map<String, dynamic>.from(
+        _storage.read<Map<String, dynamic>>(_keyUserInfo) ?? {});
+    userRank.value = Map<String, dynamic>.from(
         _storage.read<Map<String, dynamic>>(_keyUserRank) ?? {});
     userLottery.value = Map<String, dynamic>.from(
         _storage.read<Map<String, dynamic>>(_keyUserLottery) ?? {});
@@ -70,7 +70,7 @@ class StorageService extends GetxService {
     });
 
     ever<Map<String, dynamic>>(userRank, (value) {
-      _storage.write(_keyUserInfo, value);
+      _storage.write(_keyUserRank, value);
     });
     ever<Map<String, dynamic>>(userLottery, (value) {
       _storage.write(_keyUserLottery, value);
@@ -104,8 +104,8 @@ class StorageService extends GetxService {
     userInfo.assignAll(newUserInfo);
   }
 
-  /// 更新余额
-  // void updateBalance(List , double amount) {
-  //   assetsList = list;
-  // }
+  /// 更新用户抽奖次数
+  void updateUserLottery(Map<String, dynamic> newUserLottery) {
+    userLottery.assignAll(newUserLottery);
+  }
 }
