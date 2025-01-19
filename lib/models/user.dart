@@ -55,12 +55,12 @@ class UserInfo {
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
-      userId: json['userId'],
-      nickName: json['nickName'],
-      avatar: json['avatar'],
-      tgId: json['tgId'],
-      inviteCode: json['inviteCode'],
-      inviteCount: json['inviteCount'],
+      userId: json['userId'] ?? "",
+      nickName: json['nickName'] ?? "",
+      avatar: json['avatar'] ?? "",
+      tgId: json['tgId'] ?? "",
+      inviteCode: json['inviteCode'] ?? "",
+      inviteCount: json['inviteCount'] ?? "",
       giftShow: json['giftShow'],
       basicTaskFinish: json['basicTaskFinish'],
       basicTaskFinishTime: json['basicTaskFinishTime'],

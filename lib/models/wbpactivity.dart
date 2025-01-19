@@ -77,9 +77,9 @@ class Wbpactivity {
 
   factory Wbpactivity.fromJson(Map<String, dynamic> json) {
     return Wbpactivity(
-      activityId: json['activityId'],
-      activityTitle: json['activityTitle'],
-      activityLogo: json['activityLogo'],
+      activityId: json['activityId'] ?? "",
+      activityTitle: json['activityTitle'] ?? "",
+      activityLogo: json['activityLogo'] ?? "",
       awardAssetId: json['awardAssetId'],
       awardAssetName: json['awardAssetName'],
       awardAssetIcon: json['awardAssetIcon'],

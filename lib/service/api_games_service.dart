@@ -30,4 +30,17 @@ class GameService {
       rethrow;
     }
   }
+
+  Future<Response> Pickup(String activityId) async {
+    try {
+      Map<String, dynamic> queryParams = {
+        'activityId': activityId,
+      };
+      final response = await dioService.getRequest('wbpactivity/pickup',
+          queryParams: queryParams);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
