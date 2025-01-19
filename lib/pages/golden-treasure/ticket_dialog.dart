@@ -67,8 +67,9 @@ class _TicketDialogState extends State<TicketDialog> {
   @override
   Widget build(BuildContext context) {
     // final adt = storage.balances["ADT"];
-    final token = widget.token;
-    final tokenAmount = double.parse((token?.amount ?? "").toString());
+    final adt = '0';
+
+    final tokenAmount = double.parse(adt.toString());
     final assetExpense = double.parse(widget.data.assetExpense);
     final maxJoin = widget.data.maxJoin;
     final curJoin = widget.data.curJoin;

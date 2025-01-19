@@ -19,7 +19,13 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   void initState() {
     super.initState();
+    // 基础任务
     taskController.getTaskListData();
+    // userinfo/basicTaskFinish 1 完成 0 未完成
+    // 要完成基础任务才能答题
+    taskController.getTaskProgress();
+    // 校验
+    // taskController.getTaskAnswer();
   }
 
   @override

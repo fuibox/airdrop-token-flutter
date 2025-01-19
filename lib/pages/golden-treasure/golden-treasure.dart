@@ -100,9 +100,9 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
           final data =
               assetsData.data?.firstWhere((asset) => asset.name == 'ADT');
 
-          // if (data?.amount != "") {
-          //   storage.updateBalance("ADT", double.parse(data!.amount!));
-          // }
+          if (data?.amount != "") {
+            // storage.updateBalance("ADT", double.parse(data!.amount!));
+          }
 
           setState(() {
             if (data != null) {
