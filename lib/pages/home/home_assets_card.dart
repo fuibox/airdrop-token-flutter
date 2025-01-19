@@ -26,8 +26,9 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   @override
   void initState() {
     super.initState();
-    // loginController.UserConfig();
+    loginController.UserConfig();
     AppLogger.instance.e(storage.userInfo);
+    AppLogger.instance.e(storage.userWinner.value);
   }
 
   @override

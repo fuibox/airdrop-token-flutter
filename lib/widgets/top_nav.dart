@@ -32,7 +32,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
             UserLoginBar(loginController: loginController),
             // notifiication
             Obx(() {
-              if (storage.userWinner.value?.isNotEmpty ?? false) {
+              if (storage.userWinner.value.isNotEmpty ?? false) {
                 return Container(
                   child: LoopScrollWidget(
                     items: [
@@ -79,7 +79,12 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 );
               } else {
-                return Container();
+                return Container(
+                  child: Text(
+                    'sadasd',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
               }
             })
           ],

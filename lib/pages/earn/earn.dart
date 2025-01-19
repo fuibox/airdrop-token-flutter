@@ -214,8 +214,9 @@ class _EarnScreenState extends State<EarnScreen> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  if (storage.userLottery.value['opportunity'] >
-                                      0) {
+                                  if (storage.isLoggedIn.value &&
+                                      storage.userLottery.value['opportunity'] >
+                                          0) {
                                     earnPrizedrawController.UserLotteryDraw(
                                         '1');
                                   }
@@ -256,9 +257,10 @@ class _EarnScreenState extends State<EarnScreen> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  if (storage
-                                          .userLottery.value['opportunity'] >=
-                                      10) {
+                                  if (storage.isLoggedIn.value &&
+                                      storage.userLottery
+                                              .value['opportunity'] >=
+                                          10) {
                                     earnPrizedrawController.UserLotteryDraw(
                                         '10');
                                   }

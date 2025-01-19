@@ -27,6 +27,7 @@ class NotificationController extends GetxController {
           final fetchedItems = data.cast<Map<String, dynamic>>();
           items.assignAll(fetchedItems);
           displayedItems.assignAll(fetchedItems); // 同步显示数据
+          storage.userWinner.value = data;
 
           // 打印成功日志
           print('数据获取成功，共 ${fetchedItems.length} 条记录');
@@ -44,17 +45,17 @@ class NotificationController extends GetxController {
 
   void _startAutoScroll() {
     _scrollTimer = Timer.periodic(Duration(seconds: 3), (timer) {
-      // _rotateItems();
+      _rotateItems(); // 启用自动滚动
     });
   }
 
-  // void _rotateItems() {
-  //   if (items.isNotEmpty) {
-  //     var firstItem = items.removeAt(0);
-  //     items.add(firstItem);
-  //     displayedItems.value = List.from(items); // 更新 displayedItems 来触发 UI 刷新
-  //   }
-  // }
+  void _rotateItems() {
+    if (items.isNotEmpty) {
+      var firstItem = items.removeAt(0);
+      items.add(firstItem);
+      displayedItems.value = List.from(items); // 更新 displayedItems 来触发 UI 刷新
+    }
+  }
 
   void addItem(item) {
     items.add(item);
