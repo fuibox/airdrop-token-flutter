@@ -81,7 +81,7 @@ class TopNav extends StatelessWidget implements PreferredSizeWidget {
               } else {
                 return Container(
                   child: Text(
-                    'sadasd',
+                    '',
                     style: TextStyle(color: Colors.white),
                   ),
                 );
