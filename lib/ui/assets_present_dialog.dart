@@ -1,9 +1,19 @@
+import 'package:airdrop_flutter/controllers/assets_details_controller.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
-void showCenterPresent({String message = 'test'}) {
+void showCenterPresent(
+    {String message = 'test', Map<String, dynamic>? config}) {
+  AssetsDetailsController assetsDetailsController =
+      Get.put(AssetsDetailsController());
+  final storage = Get.find<StorageService>();
+  final balance = storage.assetsList.value[0]['amount'] ?? 0;
+
   // FocusNode 控制焦点，键盘弹出页面滚动
   FocusNode _focusNodeAmount = FocusNode();
   FocusNode _focusNodeTGid = FocusNode();
@@ -67,7 +77,9 @@ void showCenterPresent({String message = 'test'}) {
                   width: 250.w,
                   child: TextField(
                     onChanged: (value) {
-                      AppLogger.instance.d(value);
+                      assetsDetailsController.presentAmount.value = value;
+                      AppLogger.instance
+                          .d(assetsDetailsController.presentAmount.value);
                     },
                     controller: _controllerAmount,
                     focusNode: _focusNodeAmount,
@@ -98,14 +110,14 @@ void showCenterPresent({String message = 'test'}) {
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 9.7.w),
-                  child: Image.asset(
-                    'assets/images/adt_token.png',
+                  child: Image.network(
+                    '${config?['icon']}',
                     width: 14.5.w,
                     height: 14.5.w,
                   ),
                 ),
                 Text(
-                  '88.124',
+                  '${formatNumber(balance)}',
                   style: TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
                 )
               ],
@@ -122,7 +134,8 @@ void showCenterPresent({String message = 'test'}) {
             ),
             child: TextField(
               onChanged: (value) {
-                AppLogger.instance.d(value);
+                assetsDetailsController.presentTGid.value = value;
+                AppLogger.instance.d(assetsDetailsController.presentTGid.value);
               },
               controller: _controllerTGid,
               focusNode: _focusNodeTGid,
@@ -146,51 +159,70 @@ void showCenterPresent({String message = 'test'}) {
                 ),
                 Row(
                   children: [
-                    Image.asset(
-                      'assets/images/dialog_adc.png',
+                    Image.network(
+                      '${config?['icon']}',
                       width: 16.w,
                       height: 16.w,
                     ),
-                    Text(
-                      '4.4099',
-                      style:
-                          TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
-                    )
+                    Obx(() {
+                      return Text(
+                        ' ${assetsDetailsController.getFormattedAmount()}',
+                        style: TextStyle(
+                            color: Color(0XFF000000), fontSize: 14.sp),
+                      );
+                    })
                   ],
                 )
               ],
             ),
           ),
-          Container(
-              width: 343.w,
-              height: 48.w,
-              decoration: BoxDecoration(
-                  color: Color(0XFFD99B21),
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(width: 1.0, color: Color(0XFF000000))),
-              child: Container(
+          InkWell(
+            onTap: () {
+              final amount =
+                  int.parse(assetsDetailsController.presentAmount.value);
+              final id = config?['assetId'].toString();
+
+              if (amount != 0 &&
+                  assetsDetailsController.presentTGid.value.length > 0 &&
+                  id != null) {
+                assetsDetailsController.userGiftTokens(
+                    id,
+                    assetsDetailsController.presentTGid.value,
+                    amount.toString());
+              }
+            },
+            child: Container(
+                width: 343.w,
+                height: 48.w,
                 decoration: BoxDecoration(
+                    color: Color(0XFFD99B21),
                     borderRadius: BorderRadius.circular(8.r),
-                    border: Border(
-                        top: BorderSide(width: 2.0, color: Color(0XFFFEFFD1)))),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/assets_details_icon.png',
-                      width: 24.w,
-                      height: 24.w,
-                    ),
-                    Text(
-                      'Giveaway',
-                      style: TextStyle(
-                          color: Color(0XFF000000),
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900),
-                    )
-                  ],
-                ),
-              ))
+                    border: Border.all(width: 1.0, color: Color(0XFF000000))),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border(
+                          top: BorderSide(
+                              width: 2.0, color: Color(0XFFFEFFD1)))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/assets_details_icon.png',
+                        width: 24.w,
+                        height: 24.w,
+                      ),
+                      Text(
+                        'Giveaway',
+                        style: TextStyle(
+                            color: Color(0XFF000000),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w900),
+                      )
+                    ],
+                  ),
+                )),
+          )
         ],
       ),
     ),

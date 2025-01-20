@@ -1,5 +1,8 @@
+import 'package:airdrop_flutter/controllers/assets_details_controller.dart';
+import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
+import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,6 +16,8 @@ class HomeListScreen extends StatefulWidget {
 
 class _HomeListScreenState extends State<HomeListScreen> {
   final storage = Get.find<StorageService>();
+  AssetsDetailsController assetsDetailsController =
+      Get.put(AssetsDetailsController());
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +35,7 @@ class _HomeListScreenState extends State<HomeListScreen> {
           int index = storage.assetsList.value.indexOf(item);
           return InkWell(
             onTap: () {
-              // Get.toNamed(AppPages.assets);
+              assetsDetailsController.goAssetsDetails(item);
             },
             child: Container(
               width: 343.w,

@@ -1,6 +1,8 @@
 import 'package:airdrop_flutter/controllers/card_list_controller.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/card_dialog.dart';
 import 'package:airdrop_flutter/ui/card_send_dialog.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,7 +15,16 @@ class CardScreen extends StatefulWidget {
 }
 
 class _CardScreenState extends State<CardScreen> {
-  final UserCardListController controller = Get.put(UserCardListController());
+  final UserCardListController userCardListController =
+      Get.put(UserCardListController());
+  final storage = Get.find<StorageService>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    userCardListController.getUserNFCList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,129 +178,134 @@ class _CardScreenState extends State<CardScreen> {
                     ),
                   ],
                 )),
-            Column(
-              children: controller.userCardList.map((item) {
-                int index = controller.userCardList.indexOf(item);
-                return Container(
-                  width: 343.w,
-                  height: 120.w,
-                  margin: EdgeInsets.only(bottom: 12.w),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.r),
-                      color: Color(0XFFFFFFFF).withOpacity(0.12)),
-                  child: Container(
+            Obx(() {
+              return Column(
+                children: userCardListController.cardList.map((item) {
+                  int index = userCardListController.cardList.indexOf(item);
+                  final cardItem = userCardListController.cardList.value[index];
+                  final imageurl = getImageUrlByCardId(cardItem['cardId']);
+                  final name = getNameByCardId(cardItem['cardId']);
+                  return Container(
+                    width: 343.w,
+                    height: 120.w,
+                    margin: EdgeInsets.only(bottom: 12.w),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16.r),
-                        border: Border(
-                            top: BorderSide(
-                                width: 2.w,
-                                color: Color(0XFFFFFFFF).withOpacity(0.15)))),
-                    child: Row(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 12.w),
-                          child: Image.asset(
-                            'assets/images/card_eth.png',
-                            width: 66.w,
-                            height: 88.w,
+                        color: Color(0XFFFFFFFF).withOpacity(0.12)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border(
+                              top: BorderSide(
+                                  width: 2.w,
+                                  color: Color(0XFFFFFFFF).withOpacity(0.15)))),
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(left: 12.w),
+                            child: Image.asset(
+                              '${imageurl}',
+                              width: 66.w,
+                              height: 88.w,
+                            ),
                           ),
-                        ),
-                        Container(
-                          width: 140.w,
-                          margin: EdgeInsets.only(left: 12.w, right: 23.w),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                controller.userCardList[index],
-                                style: TextStyle(
-                                    color: Color(0XFFFFFFFF),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              Text(
-                                'Bitcoin, the digital gold,symbol origin of ...',
-                                style: TextStyle(
-                                    color: Color(0XFFFFFFFF).withOpacity(0.8),
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  showCardBox();
-                                },
+                          Container(
+                            width: 140.w,
+                            margin: EdgeInsets.only(left: 12.w, right: 23.w),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  style: TextStyle(
+                                      color: Color(0XFFFFFFFF),
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  'Bitcoin, the digital gold,symbol origin of ...',
+                                  style: TextStyle(
+                                      color: Color(0XFFFFFFFF).withOpacity(0.8),
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    showCardBox(config: cardItem);
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Recycle for',
+                                        style: TextStyle(
+                                            color: Color(0XFFCC9533),
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Image.asset(
+                                        'assets/images/gcc_token.png',
+                                        width: 16.w,
+                                        height: 16.w,
+                                      ),
+                                      Text(
+                                        '>',
+                                        style: TextStyle(
+                                            color: Color(0XFFCC9533),
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w500),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              showCardSendBox(config: cardItem);
+                            },
+                            child: Container(
+                              width: 78.w,
+                              height: 32.w,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  color: Color(0XFFBCC0CC)),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    border: Border(
+                                        top: BorderSide(
+                                            width: 3.w,
+                                            color: Color(0XFFFFFFFF)
+                                                .withOpacity(0.65)))),
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'Recycle for',
-                                      style: TextStyle(
-                                          color: Color(0XFFCC9533),
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500),
-                                    ),
                                     Image.asset(
-                                      'assets/images/gcc_token.png',
+                                      'assets/images/card_btn_icon.png',
                                       width: 16.w,
                                       height: 16.w,
                                     ),
                                     Text(
-                                      '>',
+                                      ' Gift',
                                       style: TextStyle(
-                                          color: Color(0XFFCC9533),
+                                          color: Color(0XFF000000),
                                           fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500),
+                                          fontWeight: FontWeight.w700),
                                     )
                                   ],
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            showCardSendBox();
-                          },
-                          child: Container(
-                            width: 78.w,
-                            height: 32.w,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8.r),
-                                color: Color(0XFFBCC0CC)),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  border: Border(
-                                      top: BorderSide(
-                                          width: 3.w,
-                                          color: Color(0XFFFFFFFF)
-                                              .withOpacity(0.65)))),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/card_btn_icon.png',
-                                    width: 16.w,
-                                    height: 16.w,
-                                  ),
-                                  Text(
-                                    ' Gift',
-                                    style: TextStyle(
-                                        color: Color(0XFF000000),
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700),
-                                  )
-                                ],
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
+                  );
+                }).toList(),
+              );
+            }),
 
             Container(
               width: 343.w,

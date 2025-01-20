@@ -1,9 +1,14 @@
+import 'package:airdrop_flutter/controllers/assets_details_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 void showBottomDeposit({String message = 'test'}) {
+  AssetsDetailsController assetsDetailsController =
+      Get.put(AssetsDetailsController());
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
     builder: (_) => Container(
@@ -58,7 +63,7 @@ void showBottomDeposit({String message = 'test'}) {
             width: 180.w,
             height: 180.w,
             child: QrImageView(
-              data: '1234567890',
+              data: '${assetsDetailsController.depositData['address']}',
               version: QrVersions.auto,
               size: 164.w,
             ),
@@ -84,7 +89,7 @@ void showBottomDeposit({String message = 'test'}) {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'BNB Smart CHain (BEP20)',
+                  '${assetsDetailsController.depositData['chainName']}',
                   style: TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
                 ),
                 Image.asset(
@@ -115,44 +120,63 @@ void showBottomDeposit({String message = 'test'}) {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '0X99999999999999999999999',
-                  style: TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
+                Container(
+                  width: 290.w,
+                  child: Text(
+                    '${assetsDetailsController.depositData['address']}',
+                    style: TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                Image.asset(
-                  'assets/images/assets_details_copy.png',
-                  width: 16.w,
-                  height: 16.w,
+                InkWell(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(
+                        text: assetsDetailsController.depositData['address']));
+                    SmartDialog.showToast('Copy SUCCESS');
+                  },
+                  child: Image.asset(
+                    'assets/images/assets_details_copy.png',
+                    width: 16.w,
+                    height: 16.w,
+                  ),
                 )
               ],
             ),
           ),
-          Container(
-            width: 343.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-                color: Color(0XFFD99B21),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Color(0XFF000000), width: 1.0)),
+          InkWell(
+            onTap: () {
+              Clipboard.setData(ClipboardData(
+                  text: assetsDetailsController.depositData['address']));
+              SmartDialog.showToast('Copy SUCCESS');
+            },
             child: Container(
+              width: 343.w,
+              height: 48.w,
               decoration: BoxDecoration(
+                  color: Color(0XFFD99B21),
                   borderRadius: BorderRadius.circular(8.r),
-                  border: Border(
-                      top: BorderSide(color: Color(0XFFFEFFD1), width: 2.0))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Copy Address',
-                    style: TextStyle(
-                        color: Color(0XFF000000),
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w900),
-                  )
-                ],
+                  border: Border.all(color: Color(0XFF000000), width: 1.0)),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border(
+                        top: BorderSide(color: Color(0XFFFEFFD1), width: 2.0))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Copy Address',
+                      style: TextStyle(
+                          color: Color(0XFF000000),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w900),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
+          )
         ],
       ),
     ),

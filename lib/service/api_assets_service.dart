@@ -94,10 +94,13 @@ class UserAssetsService {
 
   // 赠送代币资产
   Future<Response> AssetGiftTokens(
-      String cardId, String toAddress, String giftNumber) async {
+      String assetId, String toAddress, String giftNumber) async {
     try {
-      final response = await dioService.postRequest('asset/gift_tokens',
-          {'cardId': cardId, 'toAddress': toAddress, 'giftNumber': giftNumber});
+      final response = await dioService.postRequest('asset/gift_tokens', {
+        'assetId': assetId,
+        'toAddress': toAddress,
+        'giftNumber': giftNumber
+      });
 
       return response;
     } catch (e) {
@@ -236,6 +239,19 @@ class UserAssetsService {
         'amount': amount,
         'chainId': chainId
       });
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Response> getTokenBills(String assetId) async {
+    Map<String, dynamic> queryParams = {'assetId': assetId};
+
+    try {
+      final response =
+          await dioService.getRequest('asset/bills', queryParams: queryParams);
+
       return response;
     } catch (e) {
       rethrow;

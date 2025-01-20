@@ -1,9 +1,16 @@
+import 'package:airdrop_flutter/controllers/assets_details_controller.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
-void showBottomWithDraw({String message = 'test'}) {
+void showBottomWithDraw({String message = 'test', required Map config}) {
+  AssetsDetailsController assetsDetailsController =
+      Get.put(AssetsDetailsController());
+  final storage = Get.find<StorageService>();
   // FocusNode 控制焦点，键盘弹出页面滚动
   FocusNode _focusNodeText = FocusNode();
   FocusNode _focusNodeNumber = FocusNode();
@@ -82,7 +89,10 @@ void showBottomWithDraw({String message = 'test'}) {
                         width: 250.w,
                         child: TextField(
                           onChanged: (value) {
-                            AppLogger.instance.d(value);
+                            assetsDetailsController.withDrawAddress.value =
+                                value;
+                            AppLogger.instance.d(
+                                assetsDetailsController.withDrawAddress.value);
                           },
                           controller: _controllerText,
                           focusNode: _focusNodeText,
@@ -126,7 +136,7 @@ void showBottomWithDraw({String message = 'test'}) {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'BNB Smart Chain(BEP20)',
+                      'Binance Smart Chain',
                       style:
                           TextStyle(fontSize: 14.sp, color: Color(0XFF000000)),
                     ),
@@ -164,6 +174,11 @@ void showBottomWithDraw({String message = 'test'}) {
                     Container(
                       width: 250.w,
                       child: TextField(
+                        onChanged: (value) {
+                          assetsDetailsController.withDrawAmount.value = value;
+                          AppLogger.instance
+                              .d(assetsDetailsController.withDrawAmount.value);
+                        },
                         controller: _controllerNumber,
                         focusNode: _focusNodeNumber,
                         keyboardType: TextInputType.number,
@@ -171,20 +186,20 @@ void showBottomWithDraw({String message = 'test'}) {
                         decoration: InputDecoration(border: InputBorder.none),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/adt_token.png',
-                          width: 14.55.w,
-                          height: 14.55.w,
-                        ),
-                        Text(
-                          'ADT',
-                          style: TextStyle(
-                              color: Color(0XFF000000), fontSize: 14.sp),
-                        )
-                      ],
-                    )
+                    // Row(
+                    //   children: [
+                    //     Image.asset(
+                    //       'assets/images/adt_token.png',
+                    //       width: 14.55.w,
+                    //       height: 14.55.w,
+                    //     ),
+                    //     Text(
+                    //       'ADT',
+                    //       style: TextStyle(
+                    //           color: Color(0XFF000000), fontSize: 14.sp),
+                    //     )
+                    //   ],
+                    // )
                   ],
                 ),
               ),
@@ -200,7 +215,7 @@ void showBottomWithDraw({String message = 'test'}) {
                     Container(
                       margin: EdgeInsets.only(left: 13.w, right: 12.w),
                       child: Text(
-                        '88.1234 ADT',
+                        '${formatNumber(config['amount'], decimalPlaces: 4)} ${config['name']}',
                         style: TextStyle(
                             color: Color(0XFF0000000), fontSize: 14.sp),
                       ),
@@ -232,23 +247,25 @@ void showBottomWithDraw({String message = 'test'}) {
                     ),
                     Row(
                       children: [
-                        Container(
-                          margin: EdgeInsets.only(right: 9.w),
-                          child: Text(
-                            '5',
-                            style: TextStyle(
-                                color: Color(0XFF000000),
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w900),
-                          ),
-                        ),
-                        Image.asset(
-                          'assets/images/dialog_adc.png',
+                        Obx(() {
+                          return Container(
+                            margin: EdgeInsets.only(right: 9.w),
+                            child: Text(
+                              '${assetsDetailsController.getFormattedWithDrawAmount()}',
+                              style: TextStyle(
+                                  color: Color(0XFF000000),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w900),
+                            ),
+                          );
+                        }),
+                        Image.network(
+                          '${config['icon']}',
                           width: 16.w,
                           height: 16.w,
                         ),
                         Text(
-                          'ADG',
+                          '${config['name']}',
                           style: TextStyle(
                               color: Color(0XFF000000), fontSize: 14.sp),
                         )
@@ -282,33 +299,47 @@ void showBottomWithDraw({String message = 'test'}) {
                   ],
                 ),
               ),
-              Container(
-                  width: 343.w,
-                  height: 48.w,
-                  margin: EdgeInsets.only(top: 36.w),
-                  decoration: BoxDecoration(
-                      color: Color(0XFFD99B21),
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(width: 1.0, color: Color(0XFF000000))),
-                  child: Container(
+              InkWell(
+                onTap: () {
+                  var amount = double.parse(
+                      assetsDetailsController.withDrawAmount.value);
+                  var address = assetsDetailsController.withDrawAddress.value;
+                  var assetId = config['assetId'].toString();
+                  var chainId = assetsDetailsController.depositData['chainId'];
+                  if (amount > 0 && address.length > 0) {
+                    assetsDetailsController.userAssetWithdraw(
+                        assetId, address, amount, chainId);
+                  }
+                },
+                child: Container(
+                    width: 343.w,
+                    height: 48.w,
+                    margin: EdgeInsets.only(top: 36.w),
                     decoration: BoxDecoration(
+                        color: Color(0XFFD99B21),
                         borderRadius: BorderRadius.circular(8.r),
-                        border: Border(
-                            top: BorderSide(
-                                width: 2.0, color: Color(0XFFFEFFD1)))),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Withdraw',
-                          style: TextStyle(
-                              color: Color(0XFF000000),
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w900),
-                        )
-                      ],
-                    ),
-                  ))
+                        border:
+                            Border.all(width: 1.0, color: Color(0XFF000000))),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border(
+                              top: BorderSide(
+                                  width: 2.0, color: Color(0XFFFEFFD1)))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Withdraw',
+                            style: TextStyle(
+                                color: Color(0XFF000000),
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w900),
+                          )
+                        ],
+                      ),
+                    )),
+              )
             ],
           ),
         )),
