@@ -46,6 +46,8 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
   bool initial = false;
   late Asset token = Asset();
 
+  bool networkError = false;
+
   final exampleData = Wbpactivity(
       activityId: 976393,
       activityTitle: "2000 ADT",
@@ -90,9 +92,7 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
   late List<Wbpactivity> liveList = [];
   late List<Wbpactivity> endedList = [];
   late List<Wbpactivity> myList = [];
-  String url = "";
-
-  bool hasRefreshed = false;
+  String url = "wbpactivity/list?labelType=3&isJoinOnly=0";
 
   Future<void> FetchUserInfo() async {
     try {
@@ -173,51 +173,53 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
         myList = results[2];
       });
     } catch (e) {
-      Get.snackbar('Error', '请求失败，请重试');
+      rethrow;
     } finally {
       _controller.finishRefresh();
     }
   }
 
   void onRefresh() async {
-    if (liveList.isEmpty && endedList.isEmpty && myList.isEmpty) {
-      await onWbpactivity();
-
-      return;
-    }
-
-    if (tabIndex == 3) {
-      _controller.finishRefresh();
-      return;
-    }
     try {
-      await UserAssetList();
-      await FetchUserInfo();
-      final response = await dioService.getRequest(url + "&timestamp=0");
+      setState(() {
+        networkError = false;
+      });
+      if (liveList.isEmpty && endedList.isEmpty && myList.isEmpty) {
+        await onWbpactivity();
+      } else {
+        if (tabIndex == 3) {
+          _controller.finishRefresh();
+          return;
+        }
+        await UserAssetList();
+        await FetchUserInfo();
+        final response = await dioService.getRequest(url + "&timestamp=0");
 
-      if (response.statusCode == 200) {
-        WbpactivityModel wbpactivityData =
-            WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
+        if (response.statusCode == 200) {
+          WbpactivityModel wbpactivityData =
+              WbpactivityModel.fromJson(response.data as Map<String, dynamic>);
 
-        if (wbpactivityData.code == 200) {
-          setState(() {
-            if (tabIndex == 0) {
-              liveList = wbpactivityData.data;
-            }
-            if (tabIndex == 1) {
-              endedList = wbpactivityData.data;
-            }
-            if (tabIndex == 2) {
-              myList = wbpactivityData.data;
-            }
-          });
+          if (wbpactivityData.code == 200) {
+            setState(() {
+              if (tabIndex == 0) {
+                liveList = wbpactivityData.data;
+              }
+              if (tabIndex == 1) {
+                endedList = wbpactivityData.data;
+              }
+              if (tabIndex == 2) {
+                myList = wbpactivityData.data;
+              }
+            });
+          }
         }
       }
     } catch (e) {
-      rethrow;
+      setState(() {
+        networkError = true;
+      });
     } finally {
       _controller.finishRefresh();
-      hasRefreshed = false;
     }
   }
 
@@ -509,117 +511,150 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
                           children: [
                             ExtendedVisibilityDetector(
                               uniqueKey: LiveKey,
-                              child: _AutomaticKeepAlive(
-                                child: CustomScrollView(
-                                  physics: physics,
-                                  slivers: [
-                                    SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        return Container(
-                                          margin: EdgeInsets.only(
-                                            top: index == 0 ? 0 : 12.w,
-                                            left: 16.w,
-                                            right: 16.w,
-                                          ),
-                                          child: Skeletonizer(
-                                              enabled: liveList.isEmpty,
-                                              enableSwitchAnimation: true,
-                                              // ignoreContainers: true,
-                                              child: Card(
-                                                controller: _controller,
-                                                sc: _sc,
-                                                loading: false,
-                                                token: token,
-                                                data: liveList.isEmpty
-                                                    ? exampleData
-                                                    : liveList[index],
-                                              )),
-                                        );
-                                      },
-                                      childCount: liveList.isEmpty
-                                          ? 10
-                                          : liveList.length,
-                                    )),
-                                    const FooterLocator.sliver(),
-                                  ],
-                                ),
-                              ),
+                              child: networkError
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        "Network error. Please try again.",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : _AutomaticKeepAlive(
+                                      child: CustomScrollView(
+                                        physics: physics,
+                                        slivers: [
+                                          SliverList(
+                                              delegate:
+                                                  SliverChildBuilderDelegate(
+                                            (context, index) {
+                                              return Container(
+                                                margin: EdgeInsets.only(
+                                                  top: index == 0 ? 0 : 12.w,
+                                                  left: 16.w,
+                                                  right: 16.w,
+                                                ),
+                                                child: Skeletonizer(
+                                                    enabled: liveList.isEmpty,
+                                                    enableSwitchAnimation: true,
+                                                    // ignoreContainers: true,
+                                                    child: Card(
+                                                      controller: _controller,
+                                                      sc: _sc,
+                                                      loading: false,
+                                                      token: token,
+                                                      data: liveList.isEmpty
+                                                          ? exampleData
+                                                          : liveList[index],
+                                                    )),
+                                              );
+                                            },
+                                            childCount: liveList.isEmpty
+                                                ? 10
+                                                : liveList.length,
+                                          )),
+                                          const FooterLocator.sliver(),
+                                        ],
+                                      ),
+                                    ),
                             ),
                             ExtendedVisibilityDetector(
                               uniqueKey: EndedKey,
-                              child: _AutomaticKeepAlive(
-                                child: CustomScrollView(
-                                  physics: physics,
-                                  slivers: [
-                                    SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                      (context, index) {
-                                        return Container(
-                                          margin: EdgeInsets.only(
-                                            top: index == 0 ? 0 : 12.w,
-                                            left: 16.w,
-                                            right: 16.w,
-                                          ),
-                                          child: Skeletonizer(
-                                              enabled: endedList.isEmpty,
-                                              // ignoreContainers: true,
-                                              child: Card(
-                                                controller: _controller,
-                                                sc: _sc,
-                                                token: token,
-                                                loading: false,
-                                                data: endedList.isEmpty
-                                                    ? exampleData
-                                                    : endedList[index],
-                                              )),
-                                        );
-                                      },
-                                      childCount: endedList.isEmpty
-                                          ? 10
-                                          : endedList.length,
-                                    )),
-                                    const FooterLocator.sliver(),
-                                  ],
-                                ),
-                              ),
+                              child: networkError
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        "Network error. Please try again.",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : _AutomaticKeepAlive(
+                                      child: CustomScrollView(
+                                        physics: physics,
+                                        slivers: [
+                                          SliverList(
+                                              delegate:
+                                                  SliverChildBuilderDelegate(
+                                            (context, index) {
+                                              return Container(
+                                                margin: EdgeInsets.only(
+                                                  top: index == 0 ? 0 : 12.w,
+                                                  left: 16.w,
+                                                  right: 16.w,
+                                                ),
+                                                child: Skeletonizer(
+                                                    enabled: endedList.isEmpty,
+                                                    // ignoreContainers: true,
+                                                    child: Card(
+                                                      controller: _controller,
+                                                      sc: _sc,
+                                                      token: token,
+                                                      loading: false,
+                                                      data: endedList.isEmpty
+                                                          ? exampleData
+                                                          : endedList[index],
+                                                    )),
+                                              );
+                                            },
+                                            childCount: endedList.isEmpty
+                                                ? 10
+                                                : endedList.length,
+                                          )),
+                                          const FooterLocator.sliver(),
+                                        ],
+                                      ),
+                                    ),
                             ),
                             ExtendedVisibilityDetector(
                               uniqueKey: MyKey,
-                              child: _AutomaticKeepAlive(
-                                child: CustomScrollView(
-                                  physics: physics,
-                                  slivers: [
-                                    SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                            (context, index) {
-                                      return Container(
-                                        margin: EdgeInsets.only(
-                                          top: index == 0 ? 0 : 12.w,
-                                          left: 16.w,
-                                          right: 16.w,
+                              child: networkError
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        "Network error. Please try again.",
+                                        style: TextStyle(
+                                          color: Colors.white,
                                         ),
-                                        child: Skeletonizer(
-                                            enabled: myList.isEmpty,
-                                            // ignoreContainers: true,
-                                            child: Card(
-                                              controller: _controller,
-                                              sc: _sc,
-                                              token: token,
-                                              loading: false,
-                                              data: myList.isEmpty
-                                                  ? exampleData
-                                                  : myList[index],
-                                            )),
-                                      );
-                                    },
-                                            childCount: myList.isEmpty
-                                                ? 10
-                                                : myList.length)),
-                                    const FooterLocator.sliver(),
-                                  ],
-                                ),
-                              ),
+                                      ),
+                                    )
+                                  : _AutomaticKeepAlive(
+                                      child: CustomScrollView(
+                                        physics: physics,
+                                        slivers: [
+                                          SliverList(
+                                              delegate:
+                                                  SliverChildBuilderDelegate(
+                                                      (context, index) {
+                                            return Container(
+                                              margin: EdgeInsets.only(
+                                                top: index == 0 ? 0 : 12.w,
+                                                left: 16.w,
+                                                right: 16.w,
+                                              ),
+                                              child: Skeletonizer(
+                                                  enabled: myList.isEmpty,
+                                                  // ignoreContainers: true,
+                                                  child: Card(
+                                                    controller: _controller,
+                                                    sc: _sc,
+                                                    token: token,
+                                                    loading: false,
+                                                    data: myList.isEmpty
+                                                        ? exampleData
+                                                        : myList[index],
+                                                  )),
+                                            );
+                                          },
+                                                      childCount: myList.isEmpty
+                                                          ? 10
+                                                          : myList.length)),
+                                          const FooterLocator.sliver(),
+                                        ],
+                                      ),
+                                    ),
                             ),
                             ExtendedVisibilityDetector(
                               uniqueKey: RuleKey,
@@ -674,20 +709,6 @@ class _GoldenTreasure extends State<GoldenTreasureScreen>
             );
           }),
     );
-  }
-
-  static bool _isBottomVisible = true;
-
-  static void _scrollListener() {
-    if (ScrollController().offset > 148.w) {
-      if (_isBottomVisible) {
-        _isBottomVisible = false;
-      }
-    } else {
-      if (!_isBottomVisible) {
-        _isBottomVisible = true;
-      }
-    }
   }
 }
 
@@ -762,6 +783,22 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
   }
 
   void onParticipate() async {
+    await Get.bottomSheet(Container(
+      height: 100.w,
+      color: Colors.red,
+    ));
+    await Get.bottomSheet(Container(
+      height: 100.w,
+      color: Colors.red,
+    ));
+    await Get.bottomSheet(Container(
+      height: 100.w,
+      color: Colors.red,
+    ));
+    await Get.bottomSheet(Container(
+      height: 100.w,
+      color: Colors.red,
+    ));
     if (!isStart || isEnd || widget.data.curJoin == widget.data.maxJoin) return;
     final result = await Get.bottomSheet(
       TicketDialog(

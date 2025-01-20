@@ -43,4 +43,14 @@ class GameService {
       rethrow;
     }
   }
+
+  Future<Response> MyUncheckList() async {
+    try {
+      final response =
+          await dioService.getRequest('wbpactivity/my_uncheck_list');
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
