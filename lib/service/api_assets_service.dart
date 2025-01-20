@@ -45,11 +45,9 @@ class UserAssetsService {
   }
 
   // 资产排名列表
-  Future<Response> AssetsRankList(String from, String to) async {
+  Future<Response> AssetsRankList() async {
     try {
-      Map<String, dynamic> queryParams = {'from': from, 'to': to};
-      final response = await dioService.getRequest('asset/get_rank_list',
-          queryParams: queryParams);
+      final response = await dioService.getRequest('asset/get_rank_list');
 
       return response;
     } catch (e) {
