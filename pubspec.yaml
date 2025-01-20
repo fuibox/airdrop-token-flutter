@@ -42,6 +42,8 @@ dependencies:
   # 网络层
   dio: ^5.7.0
   web_socket_channel: ^3.0.1
+  url_launcher: ^6.3.1
+
 
   # 状态管理/路由/存储/国际化
   get: ^4.6.6

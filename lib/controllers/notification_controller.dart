@@ -4,8 +4,9 @@ import 'package:get/get.dart';
 import 'dart:async';
 
 class NotificationController extends GetxController {
-  RxList<dynamic> items = <dynamic>[].obs;
-  RxList<String> displayedItems = <String>[].obs;
+  RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs; // 保存完整数据
+  RxList<Map<String, dynamic>> displayedItems =
+      <Map<String, dynamic>>[].obs; // 同步显示完整数据
   Timer? _scrollTimer;
   final storage = Get.find<StorageService>();
 
@@ -16,39 +17,47 @@ class NotificationController extends GetxController {
     _startAutoScroll();
   }
 
-  // 获取用户奖品数据
   void fetchItems() async {
     try {
       final response = await userService.UserWinnerCarousel();
 
       if (response.statusCode == 200) {
-        List<dynamic> fetchedItems = List.from(response.data['data']);
-        storage.userWinner.value = fetchedItems;
-        items.assignAll(fetchedItems);
-        displayedItems.value = List.from(items);
+        final data = response.data['data'];
+        if (data is List) {
+          final fetchedItems = data.cast<Map<String, dynamic>>();
+          items.assignAll(fetchedItems);
+          displayedItems.assignAll(fetchedItems); // 同步显示数据
+          storage.userWinner.value = data;
+
+          // 打印成功日志
+          print('数据获取成功，共 ${fetchedItems.length} 条记录');
+        } else {
+          print('e: $data');
+        }
       } else {
-        print('数据获取失败');
+        print('数据获取失败，状态码: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('获取数据时出错: $e');
+      print('堆栈信息: $stackTrace');
     }
   }
 
   void _startAutoScroll() {
     _scrollTimer = Timer.periodic(Duration(seconds: 3), (timer) {
-      // _rotateItems();
+      _rotateItems(); // 启用自动滚动
     });
   }
 
-  // void _rotateItems() {
-  //   if (items.isNotEmpty) {
-  //     var firstItem = items.removeAt(0);
-  //     items.add(firstItem);
-  //     displayedItems.value = List.from(items); // 更新 displayedItems 来触发 UI 刷新
-  //   }
-  // }
+  void _rotateItems() {
+    if (items.isNotEmpty) {
+      var firstItem = items.removeAt(0);
+      items.add(firstItem);
+      displayedItems.value = List.from(items); // 更新 displayedItems 来触发 UI 刷新
+    }
+  }
 
-  void addItem(String item) {
+  void addItem(item) {
     items.add(item);
   }
 

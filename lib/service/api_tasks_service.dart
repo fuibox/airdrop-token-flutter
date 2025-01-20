@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import "api_service.dart";
 
 class TaskService {
@@ -13,9 +14,12 @@ class TaskService {
   }
 
   // 获取任务进度
-  Future<Response> UserTaskProgress(String taskIds) async {
+  Future<Response> UserTaskProgress({String? taskIds}) async {
     try {
-      Map<String, dynamic> queryParams = {'taskIds': taskIds};
+      Map<String, dynamic> queryParams = {};
+      if (taskIds != null && taskIds.isNotEmpty) {
+        queryParams['taskIds'] = taskIds;
+      }
       final response = await dioService.getRequest('task/progress_list',
           queryParams: queryParams);
       return response;
@@ -87,11 +91,9 @@ class TaskService {
    */
 
   // 获取我的答题进度
-  Future<Response> TaskQuizProgress(String amount) async {
+  Future<Response> TaskQuizProgress() async {
     try {
-      Map<String, dynamic> queryParams = {'amount': amount};
-      final response = await dioService.getRequest('quiz/progress',
-          queryParams: queryParams);
+      final response = await dioService.getRequest('quiz/progress');
       return response;
     } catch (e) {
       rethrow;

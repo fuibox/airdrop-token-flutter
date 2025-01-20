@@ -1,5 +1,8 @@
+import 'package:airdrop_flutter/controllers/earn_prizedraw_controller.dart';
+import 'package:airdrop_flutter/controllers/home_controller.dart';
 import 'package:airdrop_flutter/pages/earn/adt_application_zone.dart';
 import 'package:airdrop_flutter/pages/earn/ecosystem.dart';
+import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/earn_airdropbox.dialog.dart';
 import 'package:airdrop_flutter/ui/earn_prizedraw_dialog.dart';
@@ -23,6 +26,9 @@ class _EarnScreenState extends State<EarnScreen> {
   double _bottomPosition = 0.0;
   double _screenHeight = 0;
   final storage = Get.find<StorageService>();
+  final EarnPrizedrawController earnPrizedrawController =
+      Get.put(EarnPrizedrawController());
+  final HomeController homeController = Get.find();
 
   @override
   void initState() {
@@ -108,40 +114,45 @@ class _EarnScreenState extends State<EarnScreen> {
                                         ),
                                       );
                                     }),
-                                    Container(
-                                        width: 76.w,
-                                        height: 28.w,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.r),
-                                            border: Border.all(
-                                                width: 1.w,
-                                                color: Color(0XFF000000)),
-                                            color: Color(0XFFE3B04C)),
-                                        child: Container(
+                                    InkWell(
+                                      onTap: () {
+                                        homeController.selectedIndex.value = 2;
+                                      },
+                                      child: Container(
+                                          width: 76.w,
+                                          height: 28.w,
                                           decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
-                                              border: Border(
-                                                  top: BorderSide(
-                                                      width: 1.w,
-                                                      color:
-                                                          Color(0XFFFEFFD1)))),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'Get more',
-                                                style: TextStyle(
-                                                    color: Color(0XFF0D0900),
-                                                    fontSize: 14.sp,
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                            ],
-                                          ),
-                                        ))
+                                              border: Border.all(
+                                                  width: 1.w,
+                                                  color: Color(0XFF000000)),
+                                              color: Color(0XFFE3B04C)),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.r),
+                                                border: Border(
+                                                    top: BorderSide(
+                                                        width: 1.w,
+                                                        color: Color(
+                                                            0XFFFEFFD1)))),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'Get more',
+                                                  style: TextStyle(
+                                                      color: Color(0XFF0D0900),
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                              ],
+                                            ),
+                                          )),
+                                    )
                                   ],
                                 ),
                               )
@@ -156,19 +167,30 @@ class _EarnScreenState extends State<EarnScreen> {
                                 height: 62.w,
                                 opacity: const AlwaysStoppedAnimation(0),
                               ),
-                              Container(
-                                  // width: 148.w,
-                                  // height: 148.w,
-                                  margin:
-                                      EdgeInsets.only(left: 31.w, right: 31.w),
-                                  child: Image.network(
-                                    'https://airdrop-static.jyczg888.uk/web/lottery-treasure.png',
+                              Obx(() {
+                                if (earnPrizedrawController.imageUrl.isEmpty) {
+                                  return Container(
+                                    margin: EdgeInsets.only(
+                                        left: 31.w, right: 31.w),
                                     width: 160.w,
                                     height: 160.w,
-                                  )),
+                                  );
+                                } else {
+                                  return Container(
+                                      margin: EdgeInsets.only(
+                                          left: 31.w, right: 31.w),
+                                      child: Image.network(
+                                        '${earnPrizedrawController.imageUrl}',
+                                        width: 160.w,
+                                        height: 160.w,
+                                      ));
+                                }
+                              }),
                               InkWell(
                                 onTap: () {
-                                  showEarnAirdropBox();
+                                  if (storage.isLoggedIn.value) {
+                                    showEarnAirdropBox();
+                                  }
                                 },
                                 child: Container(
                                   height: 145.w,
@@ -192,16 +214,12 @@ class _EarnScreenState extends State<EarnScreen> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  int param = 10;
-                                  SmartDialog.show(
-                                    alignment: Alignment.topCenter,
-                                    clickMaskDismiss: true,
-                                    usePenetrate: false,
-                                    builder: (_) => FlipCardWidget(
-                                      isSingle: false,
-                                      rows: param == 10 ? 5 : 1, // 如果是10，显示5排
-                                    ),
-                                  );
+                                  if (storage.isLoggedIn.value &&
+                                      storage.userLottery.value['opportunity'] >
+                                          0) {
+                                    earnPrizedrawController.UserLotteryDraw(
+                                        '1');
+                                  }
                                 },
                                 child: Container(
                                     width: 138.w,
@@ -239,13 +257,13 @@ class _EarnScreenState extends State<EarnScreen> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  // setState(() {
-                                  //   _showGif = true; // 点击后显示 GIF
-                                  //   _bottomPosition = MediaQuery.of(context)
-                                  //       .size
-                                  //       .height; // 设置从底部到顶部
-                                  // });
-                                  // print("GIF started flying");
+                                  if (storage.isLoggedIn.value &&
+                                      storage.userLottery
+                                              .value['opportunity'] >=
+                                          10) {
+                                    earnPrizedrawController.UserLotteryDraw(
+                                        '10');
+                                  }
                                 },
                                 child: Container(
                                     width: 138.w,
@@ -288,7 +306,7 @@ class _EarnScreenState extends State<EarnScreen> {
                                     )),
                               )
                             ],
-                          )
+                          ),
                         ],
                       )),
 
@@ -300,28 +318,33 @@ class _EarnScreenState extends State<EarnScreen> {
               ),
             ),
           ),
-          if (_showGif)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Image.network(
-                'https://airdrop-static.jyczg888.uk/web/lottery-plain.png',
-                width: 250.w,
-                height: 250.w,
-              )
-                  .animate()
-                  .move(
-                    begin: const Offset(0, 1),
-                    end: Offset(0, -_bottomPosition),
-                    duration: Duration(seconds: 5),
-                    curve: Curves.easeInOut,
-                  )
-                  .fadeOut(
-                    duration: Duration(seconds: 3),
-                    curve: Curves.easeInOut,
-                  ),
-            )
+          Obx(() {
+            if (earnPrizedrawController.isAnimationComplete.isTrue) {
+              return Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Image.network(
+                  'https://airdrop-static.jyczg888.uk/web/lottery-plain.png',
+                  width: 250.w,
+                  height: 250.w,
+                )
+                    .animate()
+                    .move(
+                      begin: const Offset(0, 1),
+                      end: Offset(0, -1000),
+                      duration: Duration(seconds: 5),
+                      curve: Curves.easeInOut,
+                    )
+                    .fadeOut(
+                      duration: Duration(seconds: 3),
+                      curve: Curves.easeInOut,
+                    ),
+              );
+            } else {
+              return SizedBox();
+            }
+          })
         ],
       ),
     );

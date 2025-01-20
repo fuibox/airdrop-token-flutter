@@ -1,7 +1,10 @@
+import 'package:airdrop_flutter/controllers/task_answer_controller.dart';
 import 'package:airdrop_flutter/controllers/task_social_controller.dart';
 import 'package:airdrop_flutter/pages/tasks/social_tasks.dart';
 import 'package:airdrop_flutter/pages/tasks/web3_tasks.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/task_answer_dialog.dart';
+import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,12 +17,26 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
+  final TaskAnswerController taskAnserController =
+      Get.put((TaskAnswerController()));
   final SocialListController taskController = Get.put((SocialListController()));
+
+  final storage = Get.find<StorageService>();
 
   @override
   void initState() {
     super.initState();
-    taskController.getTaskListData();
+
+    if (storage.isLoggedIn.value == true) {
+      // 基础任务
+      taskController.getTaskListData();
+      // 游戏任务
+      taskAnserController.getGamesTaskProgress();
+    }
+    AppLogger.instance.e('userinfo:${storage.userInfo}');
+
+    // userinfo/basicTaskFinish 1 完成 0 未完成
+    // 要完成基础任务才能答题
   }
 
   @override
@@ -126,44 +143,93 @@ class _TasksScreenState extends State<TasksScreen> {
                       )
                     ],
                   ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          showBottomAnswer();
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(top: 12.w),
-                          width: 311.w,
-                          height: 40.w,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.r),
-                              color: Color(0XFFCED3D9)),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border(
-                                    top: BorderSide(
-                                        width: 2.w,
-                                        color:
-                                            Color(0XFFFFFFFF).withOpacity(1)))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Participate Now',
-                                  style: TextStyle(
-                                      color: Color(0XFF616973),
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  )
+                  Obx(() {
+                    final basicTaskFinish =
+                        storage.userInfo.value['basicTaskFinish'] ?? 0;
+                    final quizeFinished =
+                        storage.userInfo.value['quizeFinished'] ?? false;
+
+                    return basicTaskFinish == 1 && quizeFinished == false
+                        ? Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  showBottomAnswer();
+                                  taskAnserController.getTaskProgress();
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 12.w),
+                                  width: 311.w,
+                                  height: 40.w,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      color: Color(0XFFD99B21)),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        border: Border(
+                                            top: BorderSide(
+                                                width: 2.w,
+                                                color: Color(0XFFFEFFD1)
+                                                    .withOpacity(0.65)))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Participate Now',
+                                          style: TextStyle(
+                                              color: Color(0XFF000000),
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w700),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              InkWell(
+                                onTap: () {},
+                                child: Container(
+                                  margin: EdgeInsets.only(top: 12.w),
+                                  width: 311.w,
+                                  height: 40.w,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      color: Color(0XFFCED3D9)),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
+                                        border: Border(
+                                            top: BorderSide(
+                                                width: 2.w,
+                                                color: Color(0XFFFFFFFF)
+                                                    .withOpacity(1)))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Participate Now',
+                                          style: TextStyle(
+                                              color: Color(0XFF616973),
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w700),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          );
+                  })
                 ],
               ),
             ),

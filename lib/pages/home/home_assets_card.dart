@@ -3,6 +3,7 @@ import 'package:airdrop_flutter/controllers/user_assets.controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
+import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,7 +26,9 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
   @override
   void initState() {
     super.initState();
-    // loginController.UserConfig();
+    loginController.UserConfig();
+    AppLogger.instance.e(storage.userInfo);
+    AppLogger.instance.e(storage.userWinner.value);
   }
 
   @override
@@ -306,49 +309,56 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                   ],
                                 ),
                               ),
-                              Animate(
-                                autoPlay: true,
-                                onPlay: (controller) => controller.repeat(),
-                                effects: [
-                                  ShimmerEffect(
-                                    color: Color(0xffffdb26),
-                                    duration: Duration(seconds: 2),
-                                    angle: 0,
-                                    curve: Curves.linear,
-                                  ),
-                                ],
-                                child: Container(
-                                  width: 309.w,
-                                  height: 39.w,
-                                  margin: EdgeInsets.only(bottom: 12.w),
-                                  decoration: BoxDecoration(
-                                    color: Color(0XFFD99B21),
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    border: Border(
-                                      top: BorderSide(
-                                          width: 2.w, color: Color(0xFFFEFFD1)),
+                              InkWell(
+                                onTap: () {
+                                  homeController.selectedIndex.value = 1;
+                                },
+                                child: Animate(
+                                  autoPlay: true,
+                                  onPlay: (controller) => controller.repeat(),
+                                  effects: [
+                                    ShimmerEffect(
+                                      color: Color(0xffffdb26),
+                                      duration: Duration(seconds: 2),
+                                      angle: 0,
+                                      curve: Curves.linear,
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(right: 2.w),
-                                        child: Text(
-                                          'Earn more',
-                                          style: TextStyle(
-                                            color: Color(0XFF000000),
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w900,
+                                  ],
+                                  child: Container(
+                                    width: 309.w,
+                                    height: 39.w,
+                                    margin: EdgeInsets.only(bottom: 12.w),
+                                    decoration: BoxDecoration(
+                                      color: Color(0XFFD99B21),
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      border: Border(
+                                        top: BorderSide(
+                                            width: 2.w,
+                                            color: Color(0xFFFEFFD1)),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(right: 2.w),
+                                          child: Text(
+                                            'Earn more',
+                                            style: TextStyle(
+                                              color: Color(0XFF000000),
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w900,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Image.asset(
-                                        'assets/images/adt_icon.png',
-                                        width: 14.w,
-                                        height: 14.w,
-                                      )
-                                    ],
+                                        Image.asset(
+                                          'assets/images/adt_icon.png',
+                                          width: 14.w,
+                                          height: 14.w,
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -501,7 +511,7 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                   return Container(
                                     margin: EdgeInsets.only(right: 4.w),
                                     child: Text(
-                                      '${storage.userInfo['userId'] ?? ''}',
+                                      '${storage.userInfo.value['userId'] ?? ''}',
                                       style: TextStyle(
                                           color: Color(0XFFFFFFFF),
                                           fontSize: 14.sp),
