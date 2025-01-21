@@ -1,8 +1,16 @@
+import 'package:airdrop_flutter/controllers/task_stakeInfo_contraller.dart';
+import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 
 void showBottomPledge({String message = 'test'}) {
+  final storage = Get.find<StorageService>();
+  final TaskStakeinfoContraller taskStakeController =
+      Get.put((TaskStakeinfoContraller()));
+
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
     builder: (_) => Container(
@@ -131,36 +139,51 @@ void showBottomPledge({String message = 'test'}) {
                     fontWeight: FontWeight.w500),
               )),
 
-          Container(
-            margin: EdgeInsets.only(left: 0.w),
-            width: 343.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1.w, color: Color(0xff000000)),
-                borderRadius: BorderRadius.circular(8.r),
-                color: Color(0XFFD99B21)),
+          InkWell(
+            onTap: () {
+              final bnb = storage.assetsList.value[2]['amount'];
+              AppLogger.instance.d(bnb);
+              if (double.parse(bnb) > 0.002) {
+                taskStakeController.postUserStakeBnb();
+                AppLogger.instance.d('解锁质押');
+              }
+            },
             child: Container(
+              margin: EdgeInsets.only(left: 0.w),
+              width: 343.w,
+              height: 48.w,
               decoration: BoxDecoration(
+                  border: Border.all(width: 1.w, color: Color(0xff000000)),
                   borderRadius: BorderRadius.circular(8.r),
-                  border: Border(
-                      top: BorderSide(
-                          width: 2.w,
-                          color: Color(0XFFFEFFD1).withOpacity(0.65)))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Withdraw',
-                    style: TextStyle(
-                        color: Color(0XFF000000),
-                        fontSize: 16.sp,
-                        fontFamily: 'Figtree',
-                        fontWeight: FontWeight.w700),
-                  )
-                ],
+                  color: Color(0XFFD99B21)),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border(
+                        top: BorderSide(
+                            width: 2.w,
+                            color: Color(0XFFFEFFD1).withOpacity(0.65)))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Stake 0.002 ',
+                      style: TextStyle(
+                          color: Color(0XFF000000),
+                          fontSize: 16.sp,
+                          fontFamily: 'Figtree',
+                          fontWeight: FontWeight.w700),
+                    ),
+                    Image.asset(
+                      'assets/images/bnb_token.png',
+                      width: 16.w,
+                      height: 16.w,
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
+          )
         ],
       ),
     ),

@@ -1,4 +1,5 @@
 import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/animtedNumber.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -70,9 +71,11 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                       ),
                     ),
                     Obx(() {
-                      return Text(
-                        '\$${formatNumber(storage.prizePool.value['totalUsdtValue'] ?? 0, decimalPlaces: 4)}',
-                        style: TextStyle(
+                      return AnimatedNumber(
+                        endValue: storage.prizePool.value['totalUsdtValue'],
+                        durationInSeconds: 3,
+                        decimalPlaces: 2,
+                        textStyle: TextStyle(
                             color: Color(0xFF141414),
                             fontSize: 32.sp,
                             fontWeight: FontWeight.w700),
@@ -96,9 +99,12 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                                 fontWeight: FontWeight.w500),
                           ),
                           Obx(() {
-                            return Text(
-                              '${formatNumber(storage.prizePool.value['totalGemSupply'] ?? 0, decimalPlaces: 2)}',
-                              style: TextStyle(
+                            return AnimatedNumber(
+                              endValue:
+                                  storage.prizePool.value['totalGemSupply'],
+                              durationInSeconds: 3,
+                              decimalPlaces: 2,
+                              textStyle: TextStyle(
                                   color: Color(0XFF332E23),
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w700),
@@ -216,13 +222,16 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                                                   fontWeight: FontWeight.w700),
                                             ),
                                           ),
-                                          Text(
-                                            '${formatNumber(prizeItems[4]['amount'], decimalPlaces: 2)}',
-                                            style: TextStyle(
+                                          AnimatedNumber(
+                                            endValue: prizeItems[4]['amount'],
+                                            durationInSeconds: 3,
+                                            decimalPlaces: 2,
+                                            textStyle: TextStyle(
                                                 color: Color(0XFFE5B045),
                                                 fontSize: 12.sp,
                                                 fontWeight: FontWeight.w700),
-                                          )
+                                            showDollarSign: false,
+                                          ),
                                         ],
                                       ),
                                     ],
@@ -281,13 +290,16 @@ class _EarnAdtApplicationZoneState extends State<EarnAdtApplicationZone> {
                                                         FontWeight.w700),
                                               ),
                                             ),
-                                            Text(
-                                              '${formatNumber(prizeItems[3]['amount'], decimalPlaces: 2)}',
-                                              style: TextStyle(
+                                            AnimatedNumber(
+                                              endValue: prizeItems[3]['amount'],
+                                              durationInSeconds: 3,
+                                              decimalPlaces: 2,
+                                              textStyle: TextStyle(
                                                   color: Color(0XFFE5B045),
                                                   fontSize: 12.sp,
                                                   fontWeight: FontWeight.w700),
-                                            )
+                                              showDollarSign: false,
+                                            ),
                                           ],
                                         ),
                                       ),

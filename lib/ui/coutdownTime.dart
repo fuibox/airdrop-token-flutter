@@ -25,29 +25,29 @@ class CustomCountdownTimer extends StatelessWidget {
       widgetBuilder: (_, CurrentRemainingTime? time) {
         if (time == null) return Container();
 
-        // 获取倒计时的小时、分钟、秒数
-        String hours = time.hours?.toString().padLeft(2, '0') ?? '00';
-        String minutes = time.min?.toString().padLeft(2, '0') ?? '00';
-        String seconds = time.sec?.toString().padLeft(2, '0') ?? '00';
+        // 获取倒计时的天数、小时、分钟
+        int days = time.days ?? 0;
+        String hours = (time.hours ?? 0).toString().padLeft(2, '0');
+        String minutes = (time.min ?? 0).toString().padLeft(2, '0');
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 小时数字
+            // 显示天数
+            _buildTimeBox('$days', digitStyle),
+            _buildSeparator(),
+            // 显示小时
             _buildTimeBox(hours, digitStyle),
             _buildSeparator(),
-            // 分钟数字
+            // 显示分钟
             _buildTimeBox(minutes, digitStyle),
-            _buildSeparator(),
-            // 秒钟数字
-            _buildTimeBox(seconds, digitStyle),
           ],
         );
       },
     );
   }
 
-  // 构建每个时间段（小时、分钟、秒）的显示框
+  // 构建每个时间段（天、小时、分钟）的显示框
   Widget _buildTimeBox(String time, TextStyle style) {
     return Container(
       width: boxWidth.w,

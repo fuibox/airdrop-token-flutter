@@ -145,7 +145,7 @@ class LoginController extends GetxController {
       storage.userLottery.value = userLottery['data'] as Map<String, dynamic>;
 
       AppLogger.instance.d('userinfo:${storage.userInfo.value}');
-      AppLogger.instance.d('prize:${storage.prizePool.value['prizeItems']}');
+      AppLogger.instance.d('prize:${storage.prizePool.value}');
       AppLogger.instance.d('assets:${storage.assetsList.value[0]['amount']}');
       AppLogger.instance.d('rank:${storage.userRank.value}');
       AppLogger.instance

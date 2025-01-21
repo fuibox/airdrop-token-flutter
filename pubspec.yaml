@@ -89,6 +89,8 @@ dependencies:
   extended_nested_scroll_view: ^6.2.1
   flutter_native_splash: ^2.4.4
   skeletonizer: ^1.4.3
+
+
   # cached_network_image: ^3.4.1
 
   # 第三方登录

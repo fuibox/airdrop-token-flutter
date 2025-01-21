@@ -2,6 +2,7 @@ import 'package:airdrop_flutter/controllers/task_answer_controller.dart';
 import 'package:airdrop_flutter/controllers/task_social_controller.dart';
 import 'package:airdrop_flutter/pages/tasks/social_tasks.dart';
 import 'package:airdrop_flutter/pages/tasks/web3_tasks.dart';
+import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/task_answer_dialog.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
@@ -399,7 +400,9 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Get.toNamed(AppPages.goldenTreasure);
+                      },
                       child: Container(
                         margin: EdgeInsets.only(top: 8.w),
                         width: 311.w,

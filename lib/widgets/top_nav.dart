@@ -289,6 +289,8 @@ class _UserLoginBarState extends State<UserLoginBar> {
   }
 
   void _showUserInfoDialog() {
+    final storage = Get.find<StorageService>();
+
     SmartDialog.showAttach(
       targetContext: context,
       alignment: Alignment.bottomCenter,
@@ -408,34 +410,40 @@ class _UserLoginBarState extends State<UserLoginBar> {
                 ],
               ),
             ),
-            Container(
-                width: 343.w,
-                height: 48.w,
-                margin: EdgeInsets.only(top: 8.w),
-                decoration: BoxDecoration(
-                    color: Color(0XFFced3d9).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(width: 1.w, color: Color(0XFF000000))),
-                child: Container(
+            InkWell(
+              onTap: () {
+                SmartDialog.dismiss();
+                storage.clearAll();
+              },
+              child: Container(
+                  width: 343.w,
+                  height: 48.w,
+                  margin: EdgeInsets.only(top: 8.w),
                   decoration: BoxDecoration(
+                      color: Color(0XFFced3d9).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border(
-                          top: BorderSide(
-                              width: 3.w,
-                              color: Color(0XFFFfffff).withOpacity(0.2)))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Log out',
-                        style: TextStyle(
-                            color: Color(0XFFffffff),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500),
-                      )
-                    ],
-                  ),
-                )),
+                      border: Border.all(width: 1.w, color: Color(0XFF000000))),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border(
+                            top: BorderSide(
+                                width: 3.w,
+                                color: Color(0XFFFfffff).withOpacity(0.2)))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Log out',
+                          style: TextStyle(
+                              color: Color(0XFFffffff),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500),
+                        )
+                      ],
+                    ),
+                  )),
+            )
           ],
         ),
       ),

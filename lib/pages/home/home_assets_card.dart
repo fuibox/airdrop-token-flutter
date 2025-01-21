@@ -2,6 +2,7 @@ import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/controllers/user_assets.controller.dart';
 import 'package:airdrop_flutter/pages/home/home_list.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
+import 'package:airdrop_flutter/utils/animtedNumber.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
     loginController.UserConfig();
     AppLogger.instance.e(storage.userInfo);
     AppLogger.instance.e(storage.userWinner.value);
+    AppLogger.instance.e(storage.prizePool.value['totalGemSupply']);
   }
 
   @override
@@ -81,9 +83,12 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                               ),
                             ),
                             Obx(() {
-                              return Text(
-                                '\$${formatNumber(storage.prizePool.value['totalUsdtValue'] ?? 0, decimalPlaces: 4)}',
-                                style: TextStyle(
+                              return AnimatedNumber(
+                                endValue:
+                                    storage.prizePool.value['totalUsdtValue'],
+                                durationInSeconds: 3,
+                                decimalPlaces: 4,
+                                textStyle: TextStyle(
                                     color: Color(0xFF141414),
                                     fontSize: 32.sp,
                                     fontWeight: FontWeight.w900),
@@ -170,9 +175,11 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                             ['amount'] ??
                                         0;
 
-                                    return Text(
-                                      '${formatNumber(amount, decimalPlaces: 2)}',
-                                      style: TextStyle(
+                                    return AnimatedNumber(
+                                      endValue: amount,
+                                      durationInSeconds: 3,
+                                      decimalPlaces: 2,
+                                      textStyle: TextStyle(
                                           color: Color(0xFFEBB946),
                                           fontSize: 28.sp,
                                           fontWeight: FontWeight.w900),
@@ -207,9 +214,12 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                           height: 12.w,
                                         ),
                                         Obx(() {
-                                          return Text(
-                                            '${formatNumber(storage.prizePool.value['totalGemSupply'] ?? 0, decimalPlaces: 2)}',
-                                            style: TextStyle(
+                                          return AnimatedNumber(
+                                            endValue: storage.prizePool
+                                                .value['totalGemSupply'],
+                                            durationInSeconds: 3,
+                                            decimalPlaces: 2,
+                                            textStyle: TextStyle(
                                                 color: Color(0xFFEBB946),
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w900),
