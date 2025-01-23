@@ -4,6 +4,8 @@ import 'package:airdrop_flutter/service/api_earn_service.dart';
 import 'package:airdrop_flutter/service/api_user_service.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'dart:async';
 
@@ -88,12 +90,13 @@ class LoginController extends GetxController {
       }
       final verifyResponse = await userService.loginVerify(
           areaCode.value, phoneNumber.value, otp.value);
-      if (verifyResponse.statusCode == 200) {
+      if (verifyResponse.data['code'] == 200) {
         // 登录成功，更新登录成功状态
         isLoginSuccess.value = true;
         isLoginSuccess.refresh(); // 通知界面更新
         final storage = Get.find<StorageService>();
         storage.isLoggedIn.value = true;
+        SmartDialog.showToast('Login SUCCESS', alignment: Alignment.center);
 
         if (verifyResponse.data != null &&
             verifyResponse.data['data'] != null &&
@@ -104,6 +107,9 @@ class LoginController extends GetxController {
           Get.back();
         }
       } else {
+        SmartDialog.showToast('${verifyResponse.data['message'] ?? ''}',
+            alignment: Alignment.center);
+
         loginError.value = '登录验证失败，请检查手机号码和验证码是否正确';
       }
     } catch (e) {
@@ -150,6 +156,7 @@ class LoginController extends GetxController {
       AppLogger.instance.d('rank:${storage.userRank.value}');
       AppLogger.instance
           .d('userlotteryinfo:${storage.userLottery.value['opportunity']}');
+      storage.prizePool.refresh();
     } catch (e) {
       Get.snackbar('Error', '请求失败，请重试');
     } finally {}

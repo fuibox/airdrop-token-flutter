@@ -2,6 +2,7 @@ import 'package:airdrop_flutter/service/api_assets_service.dart';
 import 'package:airdrop_flutter/service/api_earn_service.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
@@ -47,11 +48,14 @@ class UserCardListController extends GetxController {
       AppLogger.instance.e('回收NFC:${result.data}');
       if (result.data['code'] == 200) {
         SmartDialog.dismiss();
-        SmartDialog.showToast('SUCCESS');
+        SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         final result1 = await earnService.EarnLotteryInfo();
         storage.userLottery.value =
             result1.data['data'] as Map<String, dynamic>;
         getUserNFCList();
+      } else {
+        SmartDialog.showToast('${result.data['message']}',
+            alignment: Alignment.center);
       }
     } catch (e) {
       AppLogger.instance.e('回收NFC:$e');
@@ -66,11 +70,14 @@ class UserCardListController extends GetxController {
       AppLogger.instance.e('赠送NFC:${result.data}');
       if (result.data['code'] == 200) {
         SmartDialog.dismiss();
-        SmartDialog.showToast('SUCCESS');
+        SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         final result1 = await earnService.EarnLotteryInfo();
         storage.userLottery.value =
             result1.data['data'] as Map<String, dynamic>;
         getUserNFCList();
+      } else {
+        SmartDialog.showToast('${result.data['message'] ?? ''}',
+            alignment: Alignment.center);
       }
     } catch (e) {
       AppLogger.instance.e('赠送NFC:$e');

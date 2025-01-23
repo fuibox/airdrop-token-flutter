@@ -501,8 +501,8 @@ class _HomeLeaderboardScreenState extends State<HomeLeaderboardScreen> {
                                             //         left: 9.w, right: 8.w),
                                             //     child: SvgPicture.network(
                                             //       '${item['avatar']}',
+
                                             //       width: 40.w,
-                                            //       height: 40.w,
                                             //     ),
                                             //   ),
                                             Container(

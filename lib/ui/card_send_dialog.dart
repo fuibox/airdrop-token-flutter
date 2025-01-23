@@ -217,10 +217,12 @@ void showCardSendBox({String message = 'test', required Map config}) {
                 onTap: () {
                   final address = userCardListController.cardTgId.value;
                   final amount = userCardListController.cardNum.value;
-                  userCardListController.UserGiftCard(
-                      config['cardId'].toString(),
-                      address.toString(),
-                      amount.toString());
+                  if (address.length > 0) {
+                    userCardListController.UserGiftCard(
+                        config['cardId'].toString(),
+                        address.toString(),
+                        amount.toString());
+                  }
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -230,7 +232,12 @@ void showCardSendBox({String message = 'test', required Map config}) {
                       height: 48.w,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.r),
-                          color: Color(0XFFBCC0CC)),
+                          border:
+                              Border.all(width: 1.w, color: Color(0xff000000)),
+                          color:
+                              userCardListController.cardTgId.value.length > 0
+                                  ? Color(0XFFD99B21)
+                                  : Color(0XFFBCC0CC)),
                       child: Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.r),

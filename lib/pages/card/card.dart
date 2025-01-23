@@ -787,7 +787,7 @@ class _CardScreenState extends State<CardScreen> {
                           height: 44.w,
                           margin: EdgeInsets.only(right: 16.w, top: 24.w),
                           decoration: BoxDecoration(
-                              color: Color(0XFFD99B21),
+                              color: Color(0XFFBCC0CC),
                               borderRadius: BorderRadius.circular(8.r),
                               border: Border.all(
                                   width: 1.w, color: Color(0XFF000000))),
@@ -796,7 +796,7 @@ class _CardScreenState extends State<CardScreen> {
                                 borderRadius: BorderRadius.circular(8.r),
                                 border: Border(
                                     top: BorderSide(
-                                        width: 1.w, color: Color(0XFFFEFFD1)))),
+                                        width: 2.w, color: Color(0XFFffffff)))),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

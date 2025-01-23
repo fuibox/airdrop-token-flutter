@@ -92,11 +92,11 @@ void showBottomDeposit({String message = 'test'}) {
                   '${assetsDetailsController.depositData['chainName']}',
                   style: TextStyle(color: Color(0XFF000000), fontSize: 14.sp),
                 ),
-                Image.asset(
-                  'assets/images/switch_icon.png',
-                  width: 16.w,
-                  height: 16.w,
-                )
+                // Image.asset(
+                //   'assets/images/switch_icon.png',
+                //   width: 16.w,
+                //   height: 16.w,
+                // )
               ],
             ),
           ),
@@ -133,7 +133,8 @@ void showBottomDeposit({String message = 'test'}) {
                   onTap: () {
                     Clipboard.setData(ClipboardData(
                         text: assetsDetailsController.depositData['address']));
-                    SmartDialog.showToast('Copy SUCCESS');
+                    SmartDialog.showToast('Copy SUCCESS',
+                        alignment: Alignment.center);
                   },
                   child: Image.asset(
                     'assets/images/assets_details_copy.png',
@@ -148,7 +149,8 @@ void showBottomDeposit({String message = 'test'}) {
             onTap: () {
               Clipboard.setData(ClipboardData(
                   text: assetsDetailsController.depositData['address']));
-              SmartDialog.showToast('Copy SUCCESS');
+              SmartDialog.showToast('Copy SUCCESS',
+                  alignment: Alignment.center);
             },
             child: Container(
               width: 343.w,

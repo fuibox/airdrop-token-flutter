@@ -6,8 +6,10 @@ import 'package:airdrop_flutter/utils/animtedNumber.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
 
@@ -83,9 +85,22 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                               ),
                             ),
                             Obx(() {
+                              if (storage.prizePool.value.isEmpty) {
+                                return Container(
+                                  child: Text(
+                                    '0',
+                                    style: TextStyle(
+                                        color: Color(0xFF141414),
+                                        fontSize: 32.sp,
+                                        fontWeight: FontWeight.w900),
+                                  ),
+                                );
+                              }
+                              final usdt =
+                                  storage.prizePool.value['totalUsdtValue'] ??
+                                      0;
                               return AnimatedNumber(
-                                endValue:
-                                    storage.prizePool.value['totalUsdtValue'],
+                                endValue: usdt,
                                 durationInSeconds: 3,
                                 decimalPlaces: 4,
                                 textStyle: TextStyle(
@@ -214,9 +229,14 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                           height: 12.w,
                                         ),
                                         Obx(() {
+                                          if (storage.prizePool.value.isEmpty) {
+                                            return Container();
+                                          }
+                                          final tatal = storage.prizePool
+                                                  .value['totalGemSupply'] ??
+                                              0;
                                           return AnimatedNumber(
-                                            endValue: storage.prizePool
-                                                .value['totalGemSupply'],
+                                            endValue: tatal,
                                             durationInSeconds: 3,
                                             decimalPlaces: 2,
                                             textStyle: TextStyle(
@@ -528,10 +548,20 @@ class _HomeAssetsCardScreenState extends State<HomeAssetsCardScreen> {
                                     ),
                                   );
                                 }),
-                                Image.asset(
-                                  'assets/images/home_icon_copy.png',
-                                  width: 14.w,
-                                  height: 14.w,
+                                InkWell(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text:
+                                            storage.userInfo.value['userId'] ??
+                                                ''));
+                                    SmartDialog.showToast('Copy SUCCESS',
+                                        alignment: Alignment.center);
+                                  },
+                                  child: Image.asset(
+                                    'assets/images/home_icon_copy.png',
+                                    width: 14.w,
+                                    height: 14.w,
+                                  ),
                                 )
                               ],
                             ),

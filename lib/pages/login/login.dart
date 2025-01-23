@@ -1,5 +1,6 @@
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
@@ -199,6 +200,9 @@ class LoginScreen extends StatelessWidget {
                             controller: TextEditingController(
                                 text: loginController.phoneNumber.value),
                             keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly, // 只允许数字输入
+                            ],
                             cursorColor: const Color(0xFFCC9533),
                             decoration: InputDecoration(
                               hintText: "Please enter phone number",
@@ -267,6 +271,12 @@ class LoginScreen extends StatelessWidget {
                                     cursorColor: Color(0xFFCC9533),
                                     // controller: TextEditingController(
                                     //     text: loginController.otp.value),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter
+                                          .digitsOnly, // 只允许数字输入
+                                      LengthLimitingTextInputFormatter(
+                                          6), // 限制最大输入长度为 6
+                                    ],
                                     decoration: InputDecoration(
                                       hintText: "",
                                       border: InputBorder.none,
@@ -305,42 +315,51 @@ class LoginScreen extends StatelessWidget {
                   }),
 
                   // 登录
-                  Container(
-                    margin: EdgeInsets.only(top: 40.w, bottom: 88.w),
-                    width: double.infinity,
-                    height: 48.w,
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(10.r),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0xFFFEFFD1),
-                          offset: Offset(0, -3),
-                          blurRadius: 2,
+                  Obx(() {
+                    return Container(
+                      margin: EdgeInsets.only(top: 40.w, bottom: 88.w),
+                      width: double.infinity,
+                      height: 48.w,
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(10.r),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0xFFFEFFD1),
+                            offset: Offset(0, -3),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (loginController.phoneNumber.value.length > 0 &&
+                              loginController.otp.value.length > 5) {
+                            loginController.submitLogin();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              loginController.phoneNumber.value.length > 0 &&
+                                      loginController.otp.value.length > 5
+                                  ? Color(0xFFD99621)
+                                  : Color(0XFFBCC0CC),
+                          padding: EdgeInsets.symmetric(vertical: 14.w),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        loginController.submitLogin();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD99621),
-                        padding: EdgeInsets.symmetric(vertical: 14.w),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                        child: Text(
+                          'Register/Login',
+                          style: TextStyle(
+                            color: const Color(0xFF000000),
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'Register/Login',
-                        style: TextStyle(
-                          color: const Color(0xFF000000),
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ),
+                    );
+                  }),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

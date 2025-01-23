@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/service/api_assets_service.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:rive/rive.dart';
@@ -28,6 +31,8 @@ class AssetsDetailsController extends GetxController {
   RxString withDrawAddress = ''.obs;
 
   RxList billsList = [].obs;
+
+  void addMaxAmount() {}
 
   String getFormattedAmount() {
     double? amount = double.tryParse(presentAmount.value);
@@ -63,8 +68,11 @@ class AssetsDetailsController extends GetxController {
 
       if (result.data['code'] == 200) {
         SmartDialog.dismiss();
-        SmartDialog.showToast('SUCCESS');
+        SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         loginController.UserConfig();
+      } else {
+        SmartDialog.showToast('${result.data['message'] ?? ''}',
+            alignment: Alignment.center);
       }
       AppLogger.instance.d('赠送代币:${result.data}');
     } catch (e) {
@@ -114,11 +122,12 @@ class AssetsDetailsController extends GetxController {
 
       if (result.data['code'] == 200) {
         SmartDialog.dismiss();
-        SmartDialog.showToast('SUCCESS');
+        SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         loginController.UserConfig();
       } else {
         AppLogger.instance.d('提交提现:${result.data}');
-        SmartDialog.showToast('${result.data['message']}');
+        SmartDialog.showToast('${result.data['message']}',
+            alignment: Alignment.center);
       }
     } catch (e) {
       AppLogger.instance.e('提交提现:$e');

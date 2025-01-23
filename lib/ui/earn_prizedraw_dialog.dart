@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:share_plus/share_plus.dart';
 
 class FlipCardWidget extends StatefulWidget {
   final List<Map<String, dynamic>> assetList; // 动态卡片数据
@@ -223,7 +224,12 @@ class _FlipCardWidgetState extends State<FlipCardWidget>
           SizedBox(width: 20.w),
           if (widget.isShowShare)
             InkWell(
-              onTap: () => print('Share Group'),
+              onTap: () {
+                Share.share(
+                    'https://t.me/AirdropToken001TestBot/app?startapp=hT5qB8_en');
+
+                print('Share Group');
+              },
               child: Container(
                 width: 138.w,
                 height: 44.w,

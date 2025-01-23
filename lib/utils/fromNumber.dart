@@ -7,18 +7,29 @@ String formatNumber(dynamic value, {int decimalPlaces = 4}) {
 
   String formattedNumber;
 
-  if (decimalPlaces == 0 ||
-      value is int ||
-      value.toStringAsFixed(decimalPlaces).split('.').last ==
-          '0' * decimalPlaces) {
+  // 处理整数部分，避免四舍五入
+  if (decimalPlaces == 0 || value is int) {
     formattedNumber = value.toStringAsFixed(0).replaceAllMapped(
         RegExp(r'(\d)(?=(\d{3})+$)'), (Match match) => '${match[1]},');
   } else {
-    double truncatedValue = double.parse(value.toStringAsFixed(decimalPlaces));
-    formattedNumber = truncatedValue
-        .toStringAsFixed(decimalPlaces)
-        .replaceAllMapped(
-            RegExp(r'(\d)(?=(\d{3})+\.)'), (Match match) => '${match[1]},');
+    // 对数字进行处理，保留原始小数部分，避免四舍五入
+    String valueStr = value.toString();
+    List<String> parts = valueStr.split('.');
+
+    // 处理小数部分，截取到指定的小数位
+    String integerPart = parts[0]; // 整数部分
+    String decimalPart = parts.length > 1 ? parts[1] : ''; // 小数部分
+    if (decimalPart.length > decimalPlaces) {
+      decimalPart = decimalPart.substring(0, decimalPlaces);
+    }
+
+    // 处理千分位分隔符
+    integerPart = integerPart.replaceAllMapped(
+        RegExp(r'(\d)(?=(\d{3})+$)'), (Match match) => '${match[1]},');
+
+    // 拼接整数部分和小数部分
+    formattedNumber =
+        '$integerPart${decimalPart.isNotEmpty ? '.' + decimalPart : ''}';
   }
 
   return formattedNumber;

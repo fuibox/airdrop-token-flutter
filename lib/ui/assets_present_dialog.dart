@@ -3,6 +3,7 @@ import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -84,6 +85,10 @@ void showCenterPresent(
                     controller: _controllerAmount,
                     focusNode: _focusNodeAmount,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}')), // 限制只能输入数字和最多两位小数
+                    ],
                     cursorColor: const Color(0xFFCC9533),
                     decoration: InputDecoration(
                         hintText: 'Amount',
@@ -92,9 +97,17 @@ void showCenterPresent(
                         border: InputBorder.none),
                   ),
                 ),
-                Text(
-                  'Max',
-                  style: TextStyle(color: Color(0XFFA66B19), fontSize: 14.sp),
+                InkWell(
+                  onTap: () {
+                    _controllerAmount.text = balance;
+                    assetsDetailsController.presentAmount.value = balance;
+
+                    assetsDetailsController.addMaxAmount();
+                  },
+                  child: Text(
+                    'Max',
+                    style: TextStyle(color: Color(0XFFA66B19), fontSize: 14.sp),
+                  ),
                 )
               ],
             ),
@@ -176,53 +189,61 @@ void showCenterPresent(
               ],
             ),
           ),
-          InkWell(
-            onTap: () {
-              final amount =
-                  int.parse(assetsDetailsController.presentAmount.value);
-              final id = config?['assetId'].toString();
+          Obx(() {
+            return InkWell(
+              onTap: () {
+                final amount =
+                    double.parse(assetsDetailsController.presentAmount.value)
+                        .toInt();
 
-              if (amount != 0 &&
-                  assetsDetailsController.presentTGid.value.length > 0 &&
-                  id != null) {
-                assetsDetailsController.userGiftTokens(
-                    id,
-                    assetsDetailsController.presentTGid.value,
-                    amount.toString());
-              }
-            },
-            child: Container(
-                width: 343.w,
-                height: 48.w,
-                decoration: BoxDecoration(
-                    color: Color(0XFFD99B21),
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(width: 1.0, color: Color(0XFF000000))),
-                child: Container(
+                final id = config?['assetId'].toString();
+
+                if (amount != 0 &&
+                    assetsDetailsController.presentTGid.value.length > 0 &&
+                    id != null) {
+                  assetsDetailsController.userGiftTokens(
+                      id,
+                      assetsDetailsController.presentTGid.value,
+                      amount.toString());
+                }
+              },
+              child: Container(
+                  width: 343.w,
+                  height: 48.w,
                   decoration: BoxDecoration(
+                      color: _controllerAmount.text != null &&
+                              assetsDetailsController.presentTGid.value.length >
+                                  0
+                          ? Color(0XFFD99B21)
+                          : Color(0XFFBCC0CC),
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border(
-                          top: BorderSide(
-                              width: 2.0, color: Color(0XFFFEFFD1)))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/assets_details_icon.png',
-                        width: 24.w,
-                        height: 24.w,
-                      ),
-                      Text(
-                        'Giveaway',
-                        style: TextStyle(
-                            color: Color(0XFF000000),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w900),
-                      )
-                    ],
-                  ),
-                )),
-          )
+                      border: Border.all(width: 1.0, color: Color(0XFF000000))),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border(
+                            top: BorderSide(
+                                width: 2.0, color: Color(0XFFffffff)))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/assets_details_icon.png',
+                          width: 24.w,
+                          height: 24.w,
+                        ),
+                        Text(
+                          'Giveaway',
+                          style: TextStyle(
+                              color: Color(0XFF000000),
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w900),
+                        )
+                      ],
+                    ),
+                  )),
+            );
+          })
         ],
       ),
     ),

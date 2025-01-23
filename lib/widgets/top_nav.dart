@@ -1,10 +1,13 @@
+import 'package:airdrop_flutter/controllers/assets_details_controller.dart';
 import 'package:airdrop_flutter/controllers/login_controller.dart';
 import 'package:airdrop_flutter/controllers/notification_controller.dart';
 import 'package:airdrop_flutter/routes/app_pages.dart';
+import 'package:airdrop_flutter/service/api_user_service.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/global_notifiication.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -290,6 +293,31 @@ class _UserLoginBarState extends State<UserLoginBar> {
 
   void _showUserInfoDialog() {
     final storage = Get.find<StorageService>();
+    AssetsDetailsController assetsDetailsController =
+        Get.put(AssetsDetailsController());
+    assetsDetailsController.getAssetsDepositAddress('1');
+    TextEditingController _controllerName = TextEditingController();
+    FocusNode _focusNodeName = FocusNode();
+    _controllerName.text = widget.storage.userInfo['nickName'] ?? '';
+
+    _focusNodeName.addListener(() {
+      if (!_focusNodeName.hasFocus) {
+        // 当失去焦点时，即用户输入结束，发送请求
+        userService.UpdateUserName(_controllerName.text).then((res) async {
+          if (res.data['code'] == 200) {
+            SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
+            final result = await userService.UserInfo();
+            final storage = Get.find<StorageService>();
+
+            storage.userInfo.value =
+                result.data['data'] as Map<String, dynamic>;
+          } else {
+            SmartDialog.showToast('${res.data['message']}',
+                alignment: Alignment.center);
+          }
+        });
+      }
+    });
 
     SmartDialog.showAttach(
       targetContext: context,
@@ -350,16 +378,42 @@ class _UserLoginBarState extends State<UserLoginBar> {
                   ),
                   Row(
                     children: [
-                      Obx(() {
-                        return Text(
-                          '${widget.storage.userInfo['nickName'] ?? ''}',
+                      // Obx(() {
+                      //   return
+                      Container(
+                        width: 100.w,
+                        child: TextField(
                           style: TextStyle(
-                              color: Color(0xffffffff).withOpacity(0.8),
-                              fontSize: 14.sp,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400),
-                        );
-                      }),
+                              color: Color(0xffffffff).withOpacity(0.8)),
+                          onChanged: (value) {
+                            // update phone
+                            AppLogger.instance.d(value);
+                          },
+                          controller: _controllerName,
+                          focusNode: _focusNodeName,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [],
+                          cursorColor: const Color(0xFFCC9533),
+                          decoration: InputDecoration(
+                            hintText: "",
+                            hintStyle: TextStyle(
+                                color: const Color(0xFFBFBFBF),
+                                fontSize: 16.sp),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(left: 0.w),
+                          ),
+                        ),
+                      ),
+                      // }),
+                      // Text(
+                      //   '${widget.storage.userInfo['nickName'] ?? ''}',
+                      //   style: TextStyle(
+                      //       color: Color(0xffffffff).withOpacity(0.8),
+                      //       fontSize: 14.sp,
+                      //       fontFamily: 'Figtree',
+                      //       fontWeight: FontWeight.w400),
+                      // );
+                      // }),
                       Container(
                         margin: EdgeInsets.only(left: 6.w),
                         child: Image.asset(
@@ -389,20 +443,34 @@ class _UserLoginBarState extends State<UserLoginBar> {
                   ),
                   Row(
                     children: [
-                      Text(
-                        '0xfffaa',
-                        style: TextStyle(
-                            color: Color(0xffffffff).withOpacity(0.8),
-                            fontSize: 14.sp,
-                            fontFamily: 'Figtree',
-                            fontWeight: FontWeight.w400),
-                      ),
                       Container(
-                        margin: EdgeInsets.only(left: 6.w),
-                        child: Image.asset(
-                          'assets/images/nav_bottom_copy.png',
-                          width: 14.w,
-                          height: 14.w,
+                        width: 100.w,
+                        child: Text(
+                          '${assetsDetailsController.depositData['address'] ?? ''}',
+                          style: TextStyle(
+                              color: Color(0xffffffff).withOpacity(0.8),
+                              fontSize: 14.sp,
+                              fontFamily: 'Figtree',
+                              fontWeight: FontWeight.w400),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Clipboard.setData(ClipboardData(
+                              text: assetsDetailsController
+                                      .depositData['address'] ??
+                                  ''));
+                          SmartDialog.showToast('Copy SUCCESS',
+                              alignment: Alignment.center);
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(left: 6.w),
+                          child: Image.asset(
+                            'assets/images/nav_bottom_copy.png',
+                            width: 14.w,
+                            height: 14.w,
+                          ),
                         ),
                       )
                     ],

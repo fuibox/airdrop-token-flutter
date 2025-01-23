@@ -2,16 +2,13 @@ import 'package:airdrop_flutter/controllers/earn_prizedraw_controller.dart';
 import 'package:airdrop_flutter/controllers/home_controller.dart';
 import 'package:airdrop_flutter/pages/earn/adt_application_zone.dart';
 import 'package:airdrop_flutter/pages/earn/ecosystem.dart';
-import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/ui/earn_airdropbox.dialog.dart';
-import 'package:airdrop_flutter/ui/earn_prizedraw_dialog.dart';
-import 'package:airdrop_flutter/ui/flying.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class EarnScreen extends StatefulWidget {
@@ -22,23 +19,50 @@ class EarnScreen extends StatefulWidget {
 }
 
 class _EarnScreenState extends State<EarnScreen> {
-  bool _showGif = false;
-  double _bottomPosition = 0.0;
-  double _screenHeight = 0;
   final storage = Get.find<StorageService>();
   final EarnPrizedrawController earnPrizedrawController =
       Get.put(EarnPrizedrawController());
   final HomeController homeController = Get.find();
+  late AudioPlayer _audioPlayer;
+  String musicBg = 'https://airdrop-static.jyczg888.uk/music/music.mp3';
+  bool _isAudioPlaying = false; // 添加音频播放状态
 
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer();
+    _playNetworkAudio();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _screenHeight = MediaQuery.of(context).size.height;
+  }
+
+  // 播放网络音频
+  Future<void> _playNetworkAudio() async {
+    try {
+      // 确保音频没有被重复播放
+      if (!_isAudioPlaying) {
+        await _audioPlayer.setReleaseMode(ReleaseMode.loop); // 循环播放
+        await _audioPlayer.play(
+          UrlSource(musicBg),
+        );
+        setState(() {
+          _isAudioPlaying = true;
+        });
+      }
+    } catch (e) {
+      print("Error playing audio: $e"); // 错误处理
+    }
+  }
+
+  @override
+  void dispose() {
+    // 页面销毁时停止播放
+    _audioPlayer.stop();
+    _audioPlayer.dispose(); // 释放资源
+    super.dispose();
   }
 
   @override

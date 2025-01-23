@@ -3,6 +3,7 @@ import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -105,11 +106,11 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
                               border: InputBorder.none),
                         ),
                       ),
-                      Image.asset(
-                        'assets/images/scan_code_icon.png',
-                        width: 16.w,
-                        height: 16.w,
-                      )
+                      // Image.asset(
+                      //   'assets/images/scan_code_icon.png',
+                      //   width: 16.w,
+                      //   height: 16.w,
+                      // )
                     ],
                   )),
               Container(
@@ -182,6 +183,10 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
                         controller: _controllerNumber,
                         focusNode: _focusNodeNumber,
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}')), // 限制只能输入数字和最多两位小数
+                        ],
                         cursorColor: const Color(0xFFCC9533),
                         decoration: InputDecoration(border: InputBorder.none),
                       ),
@@ -220,10 +225,17 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
                             color: Color(0XFF0000000), fontSize: 14.sp),
                       ),
                     ),
-                    Text(
-                      'Max',
-                      style:
-                          TextStyle(color: Color(0XFFA66B19), fontSize: 14.sp),
+                    InkWell(
+                      onTap: () {
+                        assetsDetailsController.withDrawAmount.value =
+                            config['amount'];
+                        _controllerNumber.text = config['amount'];
+                      },
+                      child: Text(
+                        'Max',
+                        style: TextStyle(
+                            color: Color(0XFFA66B19), fontSize: 14.sp),
+                      ),
                     )
                   ],
                 ),
@@ -299,47 +311,56 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
                   ],
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  var amount = double.parse(
-                      assetsDetailsController.withDrawAmount.value);
-                  var address = assetsDetailsController.withDrawAddress.value;
-                  var assetId = config['assetId'].toString();
-                  var chainId = assetsDetailsController.depositData['chainId'];
-                  if (amount > 0 && address.length > 0) {
-                    assetsDetailsController.userAssetWithdraw(
-                        assetId, address, amount, chainId);
-                  }
-                },
-                child: Container(
-                    width: 343.w,
-                    height: 48.w,
-                    margin: EdgeInsets.only(top: 36.w),
-                    decoration: BoxDecoration(
-                        color: Color(0XFFD99B21),
-                        borderRadius: BorderRadius.circular(8.r),
-                        border:
-                            Border.all(width: 1.0, color: Color(0XFF000000))),
-                    child: Container(
+              Obx(() {
+                final amt = assetsDetailsController.withDrawAmount.value;
+                final add = assetsDetailsController.withDrawAddress.value;
+                return InkWell(
+                  onTap: () {
+                    if (_controllerNumber != null &&
+                        _controllerText.text != null) {
+                      var amount = double.parse(
+                          assetsDetailsController.withDrawAmount.value);
+                      var address =
+                          assetsDetailsController.withDrawAddress.value;
+                      var assetId = config['assetId'].toString();
+                      var chainId =
+                          assetsDetailsController.depositData['chainId'];
+                      assetsDetailsController.userAssetWithdraw(
+                          assetId, address, amount, chainId);
+                    }
+                  },
+                  child: Container(
+                      width: 343.w,
+                      height: 48.w,
+                      margin: EdgeInsets.only(top: 36.w),
                       decoration: BoxDecoration(
+                          color: amt.length > 0 && add.length > 0
+                              ? Color(0XFFD99B21)
+                              : Color(0XFFBCC0CC),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border(
-                              top: BorderSide(
-                                  width: 2.0, color: Color(0XFFFEFFD1)))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Withdraw',
-                            style: TextStyle(
-                                color: Color(0XFF000000),
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w900),
-                          )
-                        ],
-                      ),
-                    )),
-              )
+                          border:
+                              Border.all(width: 1.0, color: Color(0XFF000000))),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border(
+                                top: BorderSide(
+                                    width: 2.0, color: Color(0XFFffffff)))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Withdraw',
+                              style: TextStyle(
+                                  color: Color(0XFF000000),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w900),
+                            )
+                          ],
+                        ),
+                      )),
+                );
+              })
             ],
           ),
         )),

@@ -63,8 +63,10 @@ void showBottomAnswer({String message = 'test'}) {
               // box
               Container(
                 width: 343.w,
-                height: 300.w,
-                padding: EdgeInsets.only(left: 16.w, top: 20.w),
+                height: answerController.questionData.value.length > 0
+                    ? null
+                    : 300.w,
+                padding: EdgeInsets.only(left: 16.w, top: 20.w, bottom: 10.w),
                 margin: EdgeInsets.only(bottom: 20.w),
                 decoration: BoxDecoration(
                     color: Color(0xffffffff),

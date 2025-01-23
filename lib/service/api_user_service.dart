@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import "api_service.dart";
 
 class UserService {
@@ -55,6 +57,7 @@ class UserService {
       };
       final response = await dioService.getRequest('user/update_nickname',
           queryParams: queryParams);
+
       return response;
     } catch (e) {
       rethrow;

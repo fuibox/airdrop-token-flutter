@@ -83,13 +83,19 @@ class EarnPrizedrawController extends GetxController {
   Future<void> UserExchangeBox(String amount) async {
     try {
       final result = await earnService.EarnLotteryExchangebox(amount);
-      AppLogger.instance.e('兑换抽奖${amount}次:${result.data}');
-      resetPrize();
-      SmartDialog.dismiss();
-      showBottomCorrect();
+      if (result.data['code'] == 200) {
+        AppLogger.instance.e('兑换抽奖${amount}次:${result.data}');
+        resetPrize();
+        SmartDialog.dismiss();
+        SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
+        showBottomCorrect();
 
-      // 刷新userinfo/assetslist
-      await loginController.UserConfig();
+        // 刷新userinfo/assetslist
+        await loginController.UserConfig();
+      } else {
+        SmartDialog.showToast('${result.data['message']}',
+            alignment: Alignment.center);
+      }
     } catch (e) {
       AppLogger.instance.e('兑换抽奖次数报错:$e');
     }

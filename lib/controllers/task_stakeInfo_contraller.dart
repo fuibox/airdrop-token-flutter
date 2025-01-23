@@ -65,6 +65,8 @@ class TaskStakeinfoContraller extends GetxController {
       AppLogger.instance.e(result.data);
       if (result.data['code'] == 200) {
         AppLogger.instance.d('刷新用户config');
+        SmartDialog.showToast('${result.data['message']}',
+            alignment: Alignment.center);
         loginController.UserConfig();
       } else {
         SmartDialog.showToast('${result.data['message']}',
