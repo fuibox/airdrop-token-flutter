@@ -34,6 +34,7 @@ class HomeScreen extends StatelessWidget {
         }
       }),
       bottomNavigationBar: BottomNav(),
+      resizeToAvoidBottomInset: true,
     );
   }
 }
