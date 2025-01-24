@@ -161,4 +161,21 @@ class LoginController extends GetxController {
       Get.snackbar('Error', '请求失败，请重试');
     } finally {}
   }
+
+  /**
+   * 第三方登录
+   */
+  // google
+  Future<void> googleLogin() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
+
+  // facebook
+  Future<void> faceBookLogin() async {
+    try {} catch (e) {
+      rethrow;
+    }
+  }
 }

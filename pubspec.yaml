@@ -96,8 +96,8 @@ dependencies:
   # cached_network_image: ^3.4.1
 
   # 第三方登录
-  # google_sign_in: ^6.2.2
-  # flutter_facebook_auth: ^7.1.1
+  google_sign_in: ^6.2.2
+  flutter_facebook_auth: ^7.1.1
 
 flutter_icons:
   ios: true
