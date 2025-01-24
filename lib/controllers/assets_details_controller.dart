@@ -22,7 +22,7 @@ class AssetsDetailsController extends GetxController {
   RxString presentTGid = ''.obs;
 
   // 充值数据
-  var depositData = {};
+  RxMap depositData = {}.obs;
 
   // 提现金额
   RxString withDrawAmount = ''.obs;
@@ -96,7 +96,7 @@ class AssetsDetailsController extends GetxController {
     try {
       final result = await userAssetsService.AssetsDepositAddress(assetId);
 
-      depositData = result.data['data'][0];
+      depositData.value = result.data['data'][0];
       AppLogger.instance.d('获取资产充值链路及地址:${result.data}');
     } catch (e) {
       AppLogger.instance.e('获取资产充值链路及地址:$e');

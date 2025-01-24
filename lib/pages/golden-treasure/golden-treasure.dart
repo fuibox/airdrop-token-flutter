@@ -783,22 +783,22 @@ class _CardState extends State<Card> with SingleTickerProviderStateMixin {
   }
 
   void onParticipate() async {
-    await Get.bottomSheet(Container(
-      height: 100.w,
-      color: Colors.red,
-    ));
-    await Get.bottomSheet(Container(
-      height: 100.w,
-      color: Colors.red,
-    ));
-    await Get.bottomSheet(Container(
-      height: 100.w,
-      color: Colors.red,
-    ));
-    await Get.bottomSheet(Container(
-      height: 100.w,
-      color: Colors.red,
-    ));
+    // await Get.bottomSheet(Container(
+    //   height: 100.w,
+    //   color: Colors.red,
+    // ));
+    // await Get.bottomSheet(Container(
+    //   height: 100.w,
+    //   color: Colors.red,
+    // ));
+    // await Get.bottomSheet(Container(
+    //   height: 100.w,
+    //   color: Colors.red,
+    // ));
+    // await Get.bottomSheet(Container(
+    //   height: 100.w,
+    //   color: Colors.red,
+    // ));
     if (!isStart || isEnd || widget.data.curJoin == widget.data.maxJoin) return;
     final result = await Get.bottomSheet(
       TicketDialog(

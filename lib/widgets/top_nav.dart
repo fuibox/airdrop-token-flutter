@@ -427,57 +427,59 @@ class _UserLoginBarState extends State<UserLoginBar> {
                 ],
               ),
             ),
-            Container(
-              width: double.infinity,
-              height: 48.w,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Wallet:',
-                    style: TextStyle(
-                        color: Color(0xffffffff),
-                        fontSize: 14.sp,
-                        fontFamily: 'Figtree',
-                        fontWeight: FontWeight.w400),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 100.w,
-                        child: Text(
-                          '${assetsDetailsController.depositData['address'] ?? ''}',
-                          style: TextStyle(
-                              color: Color(0xffffffff).withOpacity(0.8),
-                              fontSize: 14.sp,
-                              fontFamily: 'Figtree',
-                              fontWeight: FontWeight.w400),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(
-                              text: assetsDetailsController
-                                      .depositData['address'] ??
-                                  ''));
-                          SmartDialog.showToast('Copy SUCCESS',
-                              alignment: Alignment.center);
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(left: 6.w),
-                          child: Image.asset(
-                            'assets/images/nav_bottom_copy.png',
-                            width: 14.w,
-                            height: 14.w,
+            Obx(() {
+              return Container(
+                width: double.infinity,
+                height: 48.w,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Wallet:',
+                      style: TextStyle(
+                          color: Color(0xffffffff),
+                          fontSize: 14.sp,
+                          fontFamily: 'Figtree',
+                          fontWeight: FontWeight.w400),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 100.w,
+                          child: Text(
+                            '${assetsDetailsController.depositData['address'] ?? ''}',
+                            style: TextStyle(
+                                color: Color(0xffffffff).withOpacity(0.8),
+                                fontSize: 14.sp,
+                                fontFamily: 'Figtree',
+                                fontWeight: FontWeight.w400),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(
+                                text: assetsDetailsController
+                                        .depositData['address'] ??
+                                    ''));
+                            SmartDialog.showToast('Copy SUCCESS',
+                                alignment: Alignment.center);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(left: 6.w),
+                            child: Image.asset(
+                              'assets/images/nav_bottom_copy.png',
+                              width: 14.w,
+                              height: 14.w,
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              );
+            }),
             InkWell(
               onTap: () {
                 SmartDialog.dismiss();
