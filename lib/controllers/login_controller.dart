@@ -1,4 +1,5 @@
 import 'package:airdrop_flutter/controllers/notification_controller.dart';
+import 'package:airdrop_flutter/routes/app_pages.dart';
 import 'package:airdrop_flutter/service/api_assets_service.dart';
 import 'package:airdrop_flutter/service/api_earn_service.dart';
 import 'package:airdrop_flutter/service/api_user_service.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'dart:async';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginController extends GetxController {
   // 手机号
@@ -34,7 +36,9 @@ class LoginController extends GetxController {
   int get countdown => _countdown.value;
   // 按钮是否可用
   bool get isButtonEnabled => _isButtonEnabled.value;
-
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
   // 获取验证码倒计时逻辑
   void startCountdown() {
     if (_countdown.value == 60) {
@@ -167,7 +171,13 @@ class LoginController extends GetxController {
    */
   // google
   Future<void> googleLogin() async {
-    try {} catch (e) {
+    try {
+      GoogleSignInAccount? user = await _googleSignIn.signIn();
+      if (user != null) {
+        print('Signed in: ${user.displayName}');
+        Get.toNamed(AppPages.login);
+      }
+    } catch (e) {
       rethrow;
     }
   }

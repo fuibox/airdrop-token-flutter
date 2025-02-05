@@ -364,21 +364,29 @@ class LoginScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        margin: EdgeInsets.only(right: 24.w),
-                        child: Image.asset(
-                          'assets/images/ic_google.png',
-                          height: 44.w,
-                          width: 44.w,
+                      InkWell(
+                        onTap: () {
+                          loginController.googleLogin();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(right: 24.w),
+                          child: Image.asset(
+                            'assets/images/ic_google.png',
+                            height: 44.w,
+                            width: 44.w,
+                          ),
                         ),
                       ),
-                      Container(
-                        child: Image.asset(
-                          'assets/images/ic_x.png',
-                          height: 44.w,
-                          width: 44.w,
+                      InkWell(
+                        onTap: () {},
+                        child: Container(
+                          child: Image.asset(
+                            'assets/images/ic_x.png',
+                            height: 44.w,
+                            width: 44.w,
+                          ),
                         ),
-                      )
+                      ),
                     ],
                   )
                 ],
