@@ -1,6 +1,7 @@
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
@@ -378,7 +379,10 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () async {
+                          loginController.faceBookLogin();
+                          // loginController.signInWithFacebook();
+                        },
                         child: Container(
                           child: Image.asset(
                             'assets/images/ic_x.png',

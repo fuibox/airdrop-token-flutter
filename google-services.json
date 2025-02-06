@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "544284971308",
+    "project_id": "airdrop-908a2",
+    "storage_bucket": "airdrop-908a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544284971308:android:8a08e6c30a13328a495c89",
+        "android_client_info": {
+          "package_name": "com.airdrop.flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544284971308-bdld5tv1dgm2fm7lgnftd7qj0aq0hij1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.airdrop.flutter",
+            "certificate_hash": "db49a592f092413c9c401e69d930c18e2bfbce89"
+          }
+        },
+        {
+          "client_id": "544284971308-jq9qsf24rlmtqvo1d09uvcqir7giosgd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlcUPrkFMD3_UEiey6v6OWxLgVhYYdjzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544284971308-jq9qsf24rlmtqvo1d09uvcqir7giosgd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "544284971308-94quugvlh7etfp1k52o5l8ri1995a7rr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.airdropFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "544284971308",
+    "project_id": "airdrop-908a2",
+    "storage_bucket": "airdrop-908a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544284971308:android:8a08e6c30a13328a495c89",
+        "android_client_info": {
+          "package_name": "com.airdrop.flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlcUPrkFMD3_UEiey6v6OWxLgVhYYdjzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,9 +9,15 @@ import 'package:google_fonts/google_fonts.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
 import 'routes/app_pages.dart';
 import 'localization_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 确保 Flutter 绑定初始化
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // 使用生成的配置
+  );
 
   final FluroRouter router = FluroRouter();
 
