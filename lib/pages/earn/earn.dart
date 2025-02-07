@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 class EarnScreen extends StatefulWidget {
@@ -26,6 +27,10 @@ class _EarnScreenState extends State<EarnScreen> {
   late AudioPlayer _audioPlayer;
   String musicBg = 'https://airdrop-static.jyczg888.uk/music/music.mp3';
   bool _isAudioPlaying = false; // 添加音频播放状态
+  final spinkit = const SpinKitWave(
+    color: Color(0xffffffff),
+    size: 20,
+  );
 
   @override
   void initState() {
@@ -233,104 +238,117 @@ class _EarnScreenState extends State<EarnScreen> {
                               )
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  if (storage.isLoggedIn.value &&
-                                      storage.userLottery.value['opportunity'] >
-                                          0) {
-                                    earnPrizedrawController.UserLotteryDraw(
-                                        '1');
-                                  }
-                                },
-                                child: Container(
-                                    width: 138.w,
-                                    height: 44.w,
-                                    margin: EdgeInsets.only(right: 19.w),
-                                    decoration: BoxDecoration(
-                                        color: Color(0XFFD99B21),
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        border: Border.all(
-                                            width: 1.w,
-                                            color: Color(0XFF000000))),
-                                    child: Container(
+                          Obx(() {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    if (storage.isLoggedIn.value &&
+                                        storage.userLottery
+                                                .value['opportunity'] >
+                                            0) {
+                                      earnPrizedrawController.UserLotteryDraw(
+                                          '1');
+                                    }
+                                  },
+                                  child: Container(
+                                      width: 138.w,
+                                      height: 44.w,
+                                      margin: EdgeInsets.only(right: 19.w),
                                       decoration: BoxDecoration(
+                                          color: Color(0XFFD99B21),
                                           borderRadius:
                                               BorderRadius.circular(8.r),
-                                          border: Border(
-                                              top: BorderSide(
-                                                  width: 1.w,
-                                                  color: Color(0XFFFEFFD1)))),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Draw 1 Time',
-                                            style: TextStyle(
-                                                color: Color(0XFF000000),
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  if (storage.isLoggedIn.value &&
-                                      storage.userLottery
-                                              .value['opportunity'] >=
-                                          10) {
-                                    earnPrizedrawController.UserLotteryDraw(
-                                        '10');
-                                  }
-                                },
-                                child: Container(
-                                    width: 138.w,
-                                    height: 44.w,
-                                    decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0XFFFB801F),
-                                            Color(0XFFD167E5)
+                                          border: Border.all(
+                                              width: 1.w,
+                                              color: Color(0XFF000000))),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8.r),
+                                            border: Border(
+                                                top: BorderSide(
+                                                    width: 1.w,
+                                                    color: Color(0XFFFEFFD1)))),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            earnPrizedrawController
+                                                    .drawOneState.value
+                                                ? spinkit
+                                                : Text(
+                                                    'Draw 1 Time',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0XFF000000),
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  )
                                           ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(8.r),
-                                        border: Border.all(
-                                            width: 1.w,
-                                            color: Color(0XFF000000))),
-                                    child: Container(
+                                      )),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    if (storage.isLoggedIn.value &&
+                                        storage.userLottery
+                                                .value['opportunity'] >=
+                                            10) {
+                                      earnPrizedrawController.UserLotteryDraw(
+                                          '10');
+                                    }
+                                  },
+                                  child: Container(
+                                      width: 138.w,
+                                      height: 44.w,
                                       decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0XFFFB801F),
+                                              Color(0XFFD167E5)
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
                                           borderRadius:
                                               BorderRadius.circular(8.r),
-                                          border: Border(
-                                              top: BorderSide(
-                                                  width: 1.w,
-                                                  color: Color(0XFFFEFFD1)))),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Draw 10 Time',
-                                            style: TextStyle(
-                                                color: Color(0XFF000000),
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              )
-                            ],
-                          ),
+                                          border: Border.all(
+                                              width: 1.w,
+                                              color: Color(0XFF000000))),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8.r),
+                                            border: Border(
+                                                top: BorderSide(
+                                                    width: 1.w,
+                                                    color: Color(0XFFFEFFD1)))),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            earnPrizedrawController
+                                                    .drawTwoState.value
+                                                ? spinkit
+                                                : Text(
+                                                    'Draw 10 Time',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0XFF000000),
+                                                        fontSize: 16.sp,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  )
+                                          ],
+                                        ),
+                                      )),
+                                )
+                              ],
+                            );
+                          })
                         ],
                       )),
 

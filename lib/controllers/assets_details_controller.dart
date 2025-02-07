@@ -32,6 +32,8 @@ class AssetsDetailsController extends GetxController {
 
   RxList billsList = [].obs;
 
+  RxBool withDrawState = false.obs;
+
   void addMaxAmount() {}
 
   String getFormattedAmount() {
@@ -117,14 +119,18 @@ class AssetsDetailsController extends GetxController {
   Future<void> userAssetWithdraw(
       String assetId, String toAddress, num amount, num chainId) async {
     try {
+      withDrawState.value = true;
       final result = await userAssetsService.AssetwithDraw(
           assetId, toAddress, amount, chainId);
 
       if (result.data['code'] == 200) {
+        withDrawState.value = false;
+
         SmartDialog.dismiss();
         SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         loginController.UserConfig();
       } else {
+        withDrawState.value = false;
         AppLogger.instance.d('提交提现:${result.data}');
         SmartDialog.showToast('${result.data['message']}',
             alignment: Alignment.center);

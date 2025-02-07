@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 void showBottomWithDraw({String message = 'test', required Map config}) {
@@ -18,6 +19,10 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
 
   TextEditingController _controllerText = TextEditingController();
   TextEditingController _controllerNumber = TextEditingController();
+  const spinkitWithDraw = SpinKitWave(
+    color: Color(0xffffffff),
+    size: 20,
+  );
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
     builder: (_) => Container(
@@ -349,13 +354,15 @@ void showBottomWithDraw({String message = 'test', required Map config}) {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              'Withdraw',
-                              style: TextStyle(
-                                  color: Color(0XFF000000),
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w900),
-                            )
+                            assetsDetailsController.withDrawState.value
+                                ? spinkitWithDraw
+                                : Text(
+                                    'Withdraw',
+                                    style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w900),
+                                  )
                           ],
                         ),
                       )),

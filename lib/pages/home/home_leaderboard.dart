@@ -1,3 +1,4 @@
+import 'package:airdrop_flutter/storage/user_storage.dart';
 import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +16,7 @@ class HomeLeaderboardScreen extends StatefulWidget {
 
 class _HomeLeaderboardScreenState extends State<HomeLeaderboardScreen> {
   final RankingController rankController = Get.put(RankingController());
+  final storage = Get.find<StorageService>();
 
   @override
   void initState() {
@@ -142,7 +144,7 @@ class _HomeLeaderboardScreenState extends State<HomeLeaderboardScreen> {
                                   Padding(
                                     padding: EdgeInsets.only(left: 0.w),
                                     child: Text(
-                                      '32',
+                                      '${storage.userLottery.value['opportunity'] ?? 0}',
                                       style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.bold,

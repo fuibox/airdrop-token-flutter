@@ -14,6 +14,8 @@ class UserCardListController extends GetxController {
   RxInt cardNum = 1.obs;
 
   RxString cardTgId = ''.obs;
+  RxBool recycleState = false.obs;
+  RxBool sendState = false.obs;
 
   void addCardNum(bool add, int balance) async {
     if (balance != cardNum.value) {
@@ -43,10 +45,13 @@ class UserCardListController extends GetxController {
   // 回收卡片
   void getRecycleCard(String cardId, String recycleNum) async {
     try {
+      recycleState.value = true;
       final result =
           await userAssetsService.AssetRecycleCard(cardId, recycleNum);
       AppLogger.instance.e('回收NFC:${result.data}');
       if (result.data['code'] == 200) {
+        recycleState.value = false;
+
         SmartDialog.dismiss();
         SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         final result1 = await earnService.EarnLotteryInfo();
@@ -54,6 +59,8 @@ class UserCardListController extends GetxController {
             result1.data['data'] as Map<String, dynamic>;
         getUserNFCList();
       } else {
+        recycleState.value = false;
+
         SmartDialog.showToast('${result.data['message']}',
             alignment: Alignment.center);
       }
@@ -65,10 +72,12 @@ class UserCardListController extends GetxController {
   // 赠送卡片
   void UserGiftCard(String cardId, String toAddress, String giftNumber) async {
     try {
+      sendState.value = true;
       final result = await userAssetsService.AssetGiftCardNFC(
           cardId, toAddress, giftNumber);
       AppLogger.instance.e('赠送NFC:${result.data}');
       if (result.data['code'] == 200) {
+        sendState.value = false;
         SmartDialog.dismiss();
         SmartDialog.showToast('SUCCESS', alignment: Alignment.center);
         final result1 = await earnService.EarnLotteryInfo();
@@ -76,6 +85,7 @@ class UserCardListController extends GetxController {
             result1.data['data'] as Map<String, dynamic>;
         getUserNFCList();
       } else {
+        sendState.value = false;
         SmartDialog.showToast('${result.data['message'] ?? ''}',
             alignment: Alignment.center);
       }

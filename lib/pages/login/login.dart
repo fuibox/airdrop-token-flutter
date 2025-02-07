@@ -1,16 +1,24 @@
 import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../controllers/login_controller.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
+    const spinkit = SpinKitWave(
+      color: Color(0xFFD99621),
+      size: 20,
+    );
+    const spinkitLogin = SpinKitWave(
+      color: Color(0xffffffff),
+      size: 20,
+    );
 
     return Scaffold(
       appBar: null,
@@ -296,15 +304,23 @@ class LoginScreen extends StatelessWidget {
                                             loginController.sendSmsCode();
                                           }
                                         : null,
-                                    child: Text(
-                                      loginController.isButtonEnabled
-                                          ? 'Send again'
-                                          : '${loginController.countdown}',
-                                      style: TextStyle(
-                                        color: Color(0xFFA66B19),
-                                        fontSize: 14.sp,
-                                      ),
-                                    ),
+                                    child: loginController.isButtonEnabled
+                                        ? loginController.codeIsLoading.value
+                                            ? spinkit
+                                            : Text(
+                                                'Send again',
+                                                style: TextStyle(
+                                                  color: Color(0xFFA66B19),
+                                                  fontSize: 14.sp,
+                                                ),
+                                              )
+                                        : Text(
+                                            '${loginController.countdown}',
+                                            style: TextStyle(
+                                              color: Color(0xFFA66B19),
+                                              fontSize: 14.sp,
+                                            ),
+                                          ),
                                   ),
                                 ),
                               ],
@@ -350,14 +366,16 @@ class LoginScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
-                        child: Text(
-                          'Register/Login',
-                          style: TextStyle(
-                            color: const Color(0xFF000000),
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
+                        child: loginController.loginIsLoading.value
+                            ? spinkitLogin
+                            : Text(
+                                'Register/Login',
+                                style: TextStyle(
+                                  color: const Color(0xFF000000),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
                       ),
                     );
                   }),

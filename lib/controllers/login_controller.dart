@@ -33,7 +33,9 @@ class LoginController extends GetxController {
 
   // 获取验证码倒计时状态
   var _countdown = 60.obs;
-  var _isButtonEnabled = true.obs;
+  RxBool _isButtonEnabled = true.obs;
+  RxBool codeIsLoading = false.obs;
+  RxBool loginIsLoading = false.obs;
 
   int get countdown => _countdown.value;
   // 按钮是否可用
@@ -72,9 +74,14 @@ class LoginController extends GetxController {
         loginError.value = '请输入手机号码';
         return;
       }
+      codeIsLoading.value = true;
+
       final response = await userService.loginWithSms(
           areaCode.value, phoneNumber.value, otp.value);
       if (response.statusCode == 200) {
+        codeIsLoading.value = false;
+        _isButtonEnabled.value = false;
+
         startCountdown();
       } else {
         loginError.value = '发送短信验证码失败，请稍后重试';
@@ -92,10 +99,13 @@ class LoginController extends GetxController {
         loginError.value = '请输入完整的手机号码和验证码';
         return;
       }
+      loginIsLoading.value = true;
       final verifyResponse = await userService.loginVerify(
           areaCode.value, phoneNumber.value, otp.value);
       if (verifyResponse.data['code'] == 200) {
         // 登录成功，更新登录成功状态
+        loginIsLoading.value = false;
+
         isLoginSuccess.value = true;
         isLoginSuccess.refresh(); // 通知界面更新
         final storage = Get.find<StorageService>();
@@ -111,6 +121,8 @@ class LoginController extends GetxController {
           Get.back();
         }
       } else {
+        loginIsLoading.value = false;
+
         SmartDialog.showToast('${verifyResponse.data['message'] ?? ''}',
             alignment: Alignment.center);
 

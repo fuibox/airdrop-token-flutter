@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:airdrop_flutter/models/user.dart';
 import 'package:airdrop_flutter/pages/friends/backdrop.dart';
 import 'package:airdrop_flutter/pages/friends/bubble.dart';
@@ -10,7 +8,6 @@ import 'package:clipboard/clipboard.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;

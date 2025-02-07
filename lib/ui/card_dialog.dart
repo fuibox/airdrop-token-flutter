@@ -3,11 +3,16 @@ import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 void showCardBox({String message = 'test', required Map config}) {
   final UserCardListController userCardListController =
       Get.put(UserCardListController());
+  final spinkit = const SpinKitWave(
+    color: Color(0xffffffff),
+    size: 20,
+  );
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
     builder: (_) => Container(
@@ -186,46 +191,50 @@ void showCardBox({String message = 'test', required Map config}) {
                   ],
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  userCardListController.getRecycleCard(
-                      config['cardId'].toString(),
-                      userCardListController.cardNum.value.toString());
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                        width: 340.w,
-                        height: 48.w,
-                        margin: EdgeInsets.only(right: 0.w),
-                        decoration: BoxDecoration(
-                            color: Color(0XFFD99B21),
-                            borderRadius: BorderRadius.circular(8.r),
-                            border: Border.all(
-                                width: 1.w, color: Color(0XFF000000))),
-                        child: Container(
+              Obx(() {
+                return InkWell(
+                  onTap: () {
+                    userCardListController.getRecycleCard(
+                        config['cardId'].toString(),
+                        userCardListController.cardNum.value.toString());
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          width: 340.w,
+                          height: 48.w,
+                          margin: EdgeInsets.only(right: 0.w),
                           decoration: BoxDecoration(
+                              color: Color(0XFFD99B21),
                               borderRadius: BorderRadius.circular(8.r),
-                              border: Border(
-                                  top: BorderSide(
-                                      width: 2.w, color: Color(0XFFFEFFD1)))),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Recycle',
-                                style: TextStyle(
-                                    color: Color(0XFF000000),
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700),
-                              )
-                            ],
-                          ),
-                        )),
-                  ],
-                ),
-              )
+                              border: Border.all(
+                                  width: 1.w, color: Color(0XFF000000))),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border(
+                                    top: BorderSide(
+                                        width: 2.w, color: Color(0XFFFEFFD1)))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                userCardListController.recycleState.value
+                                    ? spinkit
+                                    : Text(
+                                        'Recycle',
+                                        style: TextStyle(
+                                            color: Color(0XFF000000),
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.w700),
+                                      )
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                );
+              })
             ],
           );
         })),

@@ -21,6 +21,9 @@ class EarnPrizedrawController extends GetxController {
   RxInt exChangeAmount = 1.obs; // 盒子数量
   RxInt unitPrice = 30.obs; // 单价
   RxInt priceState = 30.obs; // 当前价格
+  RxBool drawOneState = false.obs;
+  RxBool drawTwoState = false.obs;
+  RxBool buyState = false.obs;
 
   Future<void> playAnimationSequence() async {
     imageUrl.value = '';
@@ -52,28 +55,39 @@ class EarnPrizedrawController extends GetxController {
   // 抽奖
   Future<void> UserLotteryDraw(String drawNumber) async {
     try {
+      drawNumber == '1' ? drawOneState.value = true : drawTwoState.value = true;
       await playAnimationSequence();
       final result = await earnService.EarnLottery(drawNumber);
-      isShowShare = result.data['data']['isShowShare'];
-      if (result.data['data']['assetList'] is List) {
-        assetsList.assignAll((result.data['data']['assetList'] as List)
-            .map((e) => Map<String, dynamic>.from(e))
-            .toList());
+      if (result.data['code'] == 200) {
+        drawNumber == '1'
+            ? drawOneState.value = false
+            : drawTwoState.value = false;
+
+        isShowShare = result.data['data']['isShowShare'];
+        if (result.data['data']['assetList'] is List) {
+          assetsList.assignAll((result.data['data']['assetList'] as List)
+              .map((e) => Map<String, dynamic>.from(e))
+              .toList());
+        }
+
+        SmartDialog.show(
+          alignment: Alignment.topCenter,
+          clickMaskDismiss: true,
+          usePenetrate: false,
+          builder: (_) => FlipCardWidget(
+            isShowShare: isShowShare,
+            assetList: assetsList,
+          ),
+        );
+
+        AppLogger.instance.e('抽奖${drawNumber}次:${result.data}');
+        // 刷新userinfo/assetslist
+        await loginController.UserConfig();
+      } else {
+        drawNumber == '1'
+            ? drawOneState.value = false
+            : drawTwoState.value = false;
       }
-
-      SmartDialog.show(
-        alignment: Alignment.topCenter,
-        clickMaskDismiss: true,
-        usePenetrate: false,
-        builder: (_) => FlipCardWidget(
-          isShowShare: isShowShare,
-          assetList: assetsList,
-        ),
-      );
-
-      AppLogger.instance.e('抽奖${drawNumber}次:${result.data}');
-      // 刷新userinfo/assetslist
-      await loginController.UserConfig();
     } catch (e) {
       AppLogger.instance.e('抽奖:$e');
     }
@@ -82,8 +96,11 @@ class EarnPrizedrawController extends GetxController {
   // 兑换抽奖机会
   Future<void> UserExchangeBox(String amount) async {
     try {
+      buyState.value = true;
       final result = await earnService.EarnLotteryExchangebox(amount);
       if (result.data['code'] == 200) {
+        buyState.value = false;
+
         AppLogger.instance.e('兑换抽奖${amount}次:${result.data}');
         resetPrize();
         SmartDialog.dismiss();
@@ -93,6 +110,8 @@ class EarnPrizedrawController extends GetxController {
         // 刷新userinfo/assetslist
         await loginController.UserConfig();
       } else {
+        buyState.value = false;
+
         SmartDialog.showToast('${result.data['message']}',
             alignment: Alignment.center);
       }

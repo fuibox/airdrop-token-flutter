@@ -4,6 +4,7 @@ import 'package:airdrop_flutter/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 void showCardSendBox({String message = 'test', required Map config}) {
@@ -13,6 +14,10 @@ void showCardSendBox({String message = 'test', required Map config}) {
   TextEditingController _controllerTGid = TextEditingController();
   final UserCardListController userCardListController =
       Get.put(UserCardListController());
+  final spinkit = const SpinKitWave(
+    color: Color(0xffffffff),
+    size: 20,
+  );
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
     builder: (_) => Container(
@@ -213,60 +218,65 @@ void showCardSendBox({String message = 'test', required Map config}) {
                       ),
                     ],
                   )),
-              InkWell(
-                onTap: () {
-                  final address = userCardListController.cardTgId.value;
-                  final amount = userCardListController.cardNum.value;
-                  if (address.length > 0) {
-                    userCardListController.UserGiftCard(
-                        config['cardId'].toString(),
-                        address.toString(),
-                        amount.toString());
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 340.w,
-                      height: 48.w,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.r),
-                          border:
-                              Border.all(width: 1.w, color: Color(0xff000000)),
-                          color:
-                              userCardListController.cardTgId.value.length > 0
-                                  ? Color(0XFFD99B21)
-                                  : Color(0XFFBCC0CC)),
-                      child: Container(
+              Obx(() {
+                return InkWell(
+                  onTap: () {
+                    final address = userCardListController.cardTgId.value;
+                    final amount = userCardListController.cardNum.value;
+                    if (address.length > 0) {
+                      userCardListController.UserGiftCard(
+                          config['cardId'].toString(),
+                          address.toString(),
+                          amount.toString());
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 340.w,
+                        height: 48.w,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.r),
-                            border: Border(
-                                top: BorderSide(
-                                    width: 2.w,
-                                    color: Color(0XFFFFFFFF).withOpacity(1)))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/card_btn_icon.png',
-                              width: 16.w,
-                              height: 16.w,
-                            ),
-                            Text(
-                              ' Gift',
-                              style: TextStyle(
-                                  color: Color(0XFF000000),
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w700),
-                            )
-                          ],
+                            border: Border.all(
+                                width: 1.w, color: Color(0xff000000)),
+                            color:
+                                userCardListController.cardTgId.value.length > 0
+                                    ? Color(0XFFD99B21)
+                                    : Color(0XFFBCC0CC)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border(
+                                  top: BorderSide(
+                                      width: 2.w,
+                                      color:
+                                          Color(0XFFFFFFFF).withOpacity(1)))),
+                          child: userCardListController.sendState.value
+                              ? spinkit
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/card_btn_icon.png',
+                                      width: 16.w,
+                                      height: 16.w,
+                                    ),
+                                    Text(
+                                      ' Gift',
+                                      style: TextStyle(
+                                          color: Color(0XFF000000),
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w700),
+                                    )
+                                  ],
+                                ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              )
+                      )
+                    ],
+                  ),
+                );
+              })
             ],
           );
         })),

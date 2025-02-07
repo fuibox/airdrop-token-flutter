@@ -4,12 +4,17 @@ import 'package:airdrop_flutter/utils/fromNumber.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 void showEarnAirdropBox({String message = 'test'}) {
   final EarnPrizedrawController earnPrizedrawController =
       Get.put(EarnPrizedrawController());
   final storage = Get.find<StorageService>();
+  final spinkit = const SpinKitWave(
+    color: Color(0xffffffff),
+    size: 20,
+  );
 
   SmartDialog.show(
     alignment: Alignment.bottomCenter,
@@ -166,7 +171,7 @@ void showEarnAirdropBox({String message = 'test'}) {
                                   color: Color(0XFFFFFFFF).withOpacity(0.65)))),
                       child: Image.asset(
                         'assets/images/earn_dialog_left.png',
-                        width: 20.w,
+                        width: 10.w,
                         height: 3.33.w,
                       ),
                     ),
@@ -215,6 +220,7 @@ void showEarnAirdropBox({String message = 'test'}) {
                         'assets/images/earn_dialog_right.png',
                         width: 20.w,
                         height: 20.w,
+                        fit: BoxFit.scaleDown,
                       ),
                     ),
                   ),
@@ -303,50 +309,54 @@ void showEarnAirdropBox({String message = 'test'}) {
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              InkWell(
-                onTap: () {
-                  final balance = storage.assetsList.value[0]['amount'] ?? 0;
-                  final prize = earnPrizedrawController.priceState.value;
-                  if (double.parse(balance.toString()).toInt() > prize) {
-                    earnPrizedrawController.UserExchangeBox(
-                        earnPrizedrawController.exChangeAmount.value
-                            .toString());
-                  }
-                },
-                child: Container(
-                    width: 340.w,
-                    height: 48.w,
-                    margin: EdgeInsets.only(right: 0.w),
-                    decoration: BoxDecoration(
-                        color: Color(0XFFD99B21),
-                        borderRadius: BorderRadius.circular(8.r),
-                        border:
-                            Border.all(width: 1.w, color: Color(0XFF000000))),
-                    child: Container(
+          Obx(() {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                InkWell(
+                  onTap: () {
+                    final balance = storage.assetsList.value[0]['amount'] ?? 0;
+                    final prize = earnPrizedrawController.priceState.value;
+                    if (double.parse(balance.toString()).toInt() > prize) {
+                      earnPrizedrawController.UserExchangeBox(
+                          earnPrizedrawController.exChangeAmount.value
+                              .toString());
+                    }
+                  },
+                  child: Container(
+                      width: 340.w,
+                      height: 48.w,
+                      margin: EdgeInsets.only(right: 0.w),
                       decoration: BoxDecoration(
+                          color: Color(0XFFD99B21),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border(
-                              top: BorderSide(
-                                  width: 1.w, color: Color(0XFFFEFFD1)))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'BUY',
-                            style: TextStyle(
-                                color: Color(0XFF000000),
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w700),
-                          )
-                        ],
-                      ),
-                    )),
-              )
-            ],
-          )
+                          border:
+                              Border.all(width: 1.w, color: Color(0XFF000000))),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border(
+                                top: BorderSide(
+                                    width: 1.w, color: Color(0XFFFEFFD1)))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            earnPrizedrawController.buyState.value
+                                ? spinkit
+                                : Text(
+                                    'BUY',
+                                    style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w700),
+                                  )
+                          ],
+                        ),
+                      )),
+                )
+              ],
+            );
+          })
         ],
       ),
     ),
